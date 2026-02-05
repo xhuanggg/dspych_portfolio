@@ -295,16 +295,14 @@ $(document).ready(function () {
 </div>
 
 
-<blockquote>
-<p>The projects should be numbered consecutively (i.e., in the order in
-which you began them), and should include for each project a description
-of the goal, the product (computer program, hand graph, computer graph,
-etc.), the data, and some interpretation. Reports must be reproducible
-and of high quality in terms of writing, grammar, presentation, etc.</p>
-</blockquote>
+<p>This portfolio aims to practice my skills of data wrangling.
+Specifically, I will import M .out files and present them in a more
+straightforward fashion. I choose to do this because (a) it is very
+confusing to find the right information in M and (b) I need present some
+modeling for my SPSP poster.</p>
 <pre class="r"><code>library(tidyverse) 
 library(tidyr)
-data(fish_encounters)</code></pre>
+library(MplusAutomation)</code></pre>
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum
 eget nibh vel est aliquet iaculis at placerat sem. Aenean faucibus
 iaculis ultricies. Nullam consequat odio in ultricies ullamcorper. Etiam
@@ -343,7 +341,8 @@ euismod.</p>
 <pre class="r"><code># Create a barplot of the number of fish encounters by species
 ggplot(data = fish_encounters, aes(x = station, y = seen)) +
   geom_bar(stat = &quot;identity&quot;) +
-  labs(x = &quot;Species&quot;, y = &quot;Number of Fish Encounters&quot;)</code></pre>
+  labs(x = &quot;Species&quot;, y = &quot;Number of Fish Encounters&quot;) +
+  theme_minimal()</code></pre>
 <p><img src="p01_files/figure-html/unnamed-chunk-2-1.png" alt="" width="672" /></p>
 <p>Mauris placerat in velit a pharetra. Nulla viverra bibendum lectus,
 ut lobortis nibh. Aenean malesuada, orci vitae dictum placerat, enim
@@ -355,7 +354,8 @@ feugiat risus at turpis tincidunt viverra.</p>
 <pre class="r"><code># Create a barplot of the number of fish encounters by species
 ggplot(data = fish_encounters, aes(x = station, y = seen)) +
   geom_bar(stat = &quot;identity&quot;) +
-  labs(x = &quot;Species&quot;, y = &quot;Number of Fish Encounters&quot;)</code></pre>
+  labs(x = &quot;Species&quot;, y = &quot;Number of Fish Encounters&quot;) +
+  theme_classic()</code></pre>
 <p><img src="p01_files/figure-html/unnamed-chunk-3-1.png" alt="" width="672" /></p>
 <p>Donec sagittis suscipit orci in ultrices. Vivamus iaculis eleifend
 est et dictum. Fusce non urna at lacus dapibus tincidunt ac sed nibh.

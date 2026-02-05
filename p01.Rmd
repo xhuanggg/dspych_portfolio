@@ -2,26 +2,18 @@
 title: "Portfolio 1"
 ---
 
-> The projects should be numbered consecutively (i.e., in the order in which you began them), and should include for each project a description of the goal, the product (computer program, hand graph, computer graph, etc.), the data, and some interpretation. Reports must be reproducible and of high quality in terms of writing, grammar, presentation, etc.
+This portfolio aims to practice my skills of data wrangling. Specifically, I will import Mplus .out files and present them in a more straightforward fashion. I choose to do this because (a) it is very confusing to find the right information in Mplus and (b) I need present some modeling for my SPSP poster. 
 
 ```{r load-packages, warning = FALSE, message=FALSE}
 library(tidyverse) 
 library(tidyr)
-data(fish_encounters)
+library(MplusAutomation)
 ```
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum eget nibh vel est aliquet iaculis at placerat sem. Aenean faucibus iaculis ultricies. Nullam consequat odio in ultricies ullamcorper. Etiam venenatis in est vitae ullamcorper. Nam vitae urna ut dolor rhoncus aliquet at vel neque. Quisque tristique leo finibus nisi interdum, sit amet tempor risus viverra. Donec mollis vulputate sodales. Nunc ornare, leo quis euismod eleifend, eros mi maximus felis, vel varius lacus dui eget nibh. Duis vitae nunc nisl. Donec accumsan aliquam elit, eu fringilla quam pulvinar eget.
+# Import Mplus .out file
 
-Mauris in ligula mauris. Curabitur facilisis pharetra metus eget lobortis. In egestas nibh sit amet faucibus eleifend. Suspendisse imperdiet viverra blandit. Phasellus consectetur tincidunt eros eu facilisis. Quisque maximus, orci eget sodales aliquam, velit lorem semper dolor, nec convallis erat ipsum mattis velit. Pellentesque porttitor, mauris vitae aliquam mattis, metus nisl viverra turpis, vel convallis metus sapien et ex. Nunc consequat ipsum id dolor eleifend, sit amet semper eros sodales. Pellentesque consectetur, dui quis venenatis malesuada, nunc lorem lacinia libero, vitae malesuada dui arcu in augue. Aliquam id sagittis libero. Vestibulum aliquet sagittis libero, non posuere odio molestie ut. Curabitur lacus enim, viverra vel odio non, pretium efficitur elit. Mauris posuere efficitur interdum. Nunc sed bibendum turpis, quis fringilla velit. Phasellus eu lorem lobortis eros molestie laoreet.
+```{r import-file}
 
-
-
-```{r}
-# Create a barplot of the number of fish encounters by species
-ggplot(data = fish_encounters, aes(x = station, y = seen)) +
-  geom_bar(stat = "identity") +
-  labs(x = "Species", y = "Number of Fish Encounters")
-  
 ```
 
 
