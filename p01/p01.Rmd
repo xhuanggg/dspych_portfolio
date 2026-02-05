@@ -1,5 +1,7 @@
 ---
 title: "Portfolio 1"
+author: "Thomaas Huang"
+output: github_document
 ---
 
 This portfolio aims to practice my skills of data wrangling. Specifically, I will import Mplus .out files and present them in a more straightforward fashion. I choose to do this because (a) it is very confusing to find the right information in Mplus and (b) I need present some modeling for my SPSP poster. 
