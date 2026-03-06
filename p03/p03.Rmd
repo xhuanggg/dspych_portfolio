@@ -1,0 +1,76 @@
+---
+title: "Portfolio 3"
+author: "Thomas Huang"
+date: "2026-03-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This piece reflects something fancy I recently learned, creating a word cloud in R. I will use the taylor package as the source of my data. Some text analyses in this piece builds on one of my undergraduate course project.
+
+## Load packages
+
+```{r load-packages}
+library(taylor);library(tidyverse);library(tidytext);library(quanteda);library(quanteda.textplots)
+```
+
+## Extract data
+
+```{r data}
+data(taylor_album_songs)
+glimpse(taylor_album_songs)
+
+# The lyrics column is nested. I will unnest it.
+taylor_album_song.un<- taylor_album_songs %>% 
+    unnest(lyrics) 
+
+glimpse(taylor_album_song.un)
+```
+
+## Convert lyrics into Quanteda corpus
+
+```{r preprocess-corpus}
+lyrics.cp <- corpus(taylor_album_song.un$lyric,
+                  docvars = taylor_album_song.un$track_name)
+```
+
+## Tokenize
+
+This step removes the punctuation, removing the stopwords, removing the numbers
+```{r preprocess-token}
+token_lyrics.clean <- lyrics.cp %>% 
+  quanteda::tokens(remove_punct = TRUE, 
+                   remove_numbers = TRUE) %>%
+  tokens_tolower() %>%
+  tokens_remove(stopwords("en")) 
+```
+
+## Create a DFM
+
+A DFM refers to a A Document-Feature Matrix. It transforms unstructured text into structured data based on the tokens. Details can be found here: http://library.virginia.edu/data/articles/a-beginners-guide-to-text-analysis-with-quanteda
+
+```{r preprocess-DFM}
+lyrics_dfm <- dfm(token_lyrics.clean)
+```
+
+## Word cloud
+
+Feeding the DFM into the textplot function would create the word cloud.
+
+```{r wordcloud}
+textplot_wordcloud(
+      lyrics_dfm,
+      min_size = 0.5,
+      max_size = 5,
+      min_count = 10,
+      max_words = 500,
+      color = "RED",
+      font = NULL,
+      adjust = 0,
+      rotation = 0.1
+  )
+```
+
