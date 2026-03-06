@@ -2,7 +2,7 @@
 title: "Portfolio 3"
 author: "Thomas Huang"
 date: "2026-03-06"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
