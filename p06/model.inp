@@ -1,0 +1,154 @@
+TITLE:
+model;
+DATA:
+FILE = "model.dat"; 
+VARIABLE:
+NAMES = Code FourDSQ PHQ9 GAD7 Direct Medium Group Appear Body Age GenderId SexPanBi
+     SexOther EduBelo EduAbov SocLad EmpStu EmpUnemp EmpOth Out WomPtn D1 D2 D3 IH1
+     IH2 IH3 A1 A2 A3; 
+ MISSING=.;
+ usevar = FourDSQ - A3;
+   categorical = Direct Medium Group Appear Body;
+    auxiliary = Code;
+ANALYSIS:
+estimator = ML;
+    bootstrap = 1000;
+    processors = 20;
+MODEL:
+
+   IP by FourDSQ PHQ9 GAD7;
+   IP by FourDSQ@1;
+   
+   D by D1 D2 D3;
+   D by D1@1;
+   
+   IH by IH1 IH2 IH3;
+   IH by IH1@1;
+   
+   A by A1 A2 A3;
+   A by A1@1;
+   
+   IH with A;
+   
+   D with IP;
+   
+   IH on Age GenderId SexPanBi SexOther 
+   out WomPtn EduBelo EduAbov 
+   EmpStu EmpUnemp EmpOth SocLad;
+   
+   A on Age GenderId SexPanBi SexOther 
+   out WomPtn EduBelo EduAbov 
+   EmpStu EmpUnemp EmpOth SocLad;
+   
+   IP on
+   Direct Medium Group Appear Body
+   IH A Age GenderId SexPanBi SexOther 
+   out WomPtn EduBelo EduAbov 
+   EmpStu EmpUnemp EmpOth SocLad;
+   
+   D on
+   Direct Medium Group Appear Body
+   IH A Age GenderId SexPanBi SexOther 
+   out WomPtn EduBelo EduAbov 
+   EmpStu EmpUnemp EmpOth SocLad;
+   
+   Direct on 
+   IH A Age GenderId SexPanBi SexOther 
+   out WomPtn EduBelo EduAbov 
+   EmpStu EmpUnemp EmpOth SocLad;
+   
+   Medium on 
+   IH A Age GenderId SexPanBi SexOther 
+   out WomPtn EduBelo EduAbov 
+   EmpStu EmpUnemp EmpOth SocLad;
+   
+   Group on 
+   IH A Age GenderId SexPanBi SexOther 
+   out WomPtn EduBelo EduAbov 
+   EmpStu EmpUnemp EmpOth SocLad;
+   
+   Appear on 
+   IH A Age GenderId SexPanBi SexOther 
+   out WomPtn EduBelo EduAbov 
+   EmpStu EmpUnemp EmpOth SocLad;
+   
+   Body on 
+   IH A Age GenderId SexPanBi SexOther 
+   out WomPtn EduBelo EduAbov 
+   EmpStu EmpUnemp EmpOth SocLad;
+   
+   Group on 
+   IH A Age GenderId SexPanBi SexOther 
+   out WomPtn EduBelo EduAbov 
+   EmpStu EmpUnemp EmpOth SocLad;
+   
+   !A-paths;
+   Direct on IH (a11);
+   Direct on A (a12);
+   Medium on IH (a21);
+   Medium on A (a22);
+   Group on IH (a31);
+   Group on A (a32);
+   Appear on IH (a41);
+   Appear on A (a42);
+   Body on IH (a51);
+   Body on A (a52);
+   
+   !B-paths;
+   D on Direct (b11);
+   D on Medium (b21);
+   D on Group (b31);
+   D on Appear (b41);
+   D on Body (b51);
+   IP on Direct (b12);
+   IP on Medium (b22);
+   IP on Group (b32);
+   IP on Appear (b42);
+   IP on Body (b52);
+   
+MODEL CONSTRAINT:
+
+  !Indirect effects;
+  !First digit: Predictor, 1 = IH, 2 = A;
+  !Second digit: Mediator, 1 = Direct, 2 = Medium, 3 = Group,
+  !4 = Appear, 5 = Body;
+  !Third digit: Outcome, 1 = D, 2 = IP;
+  !Mediator = Direct;
+  NEW(ind111 ind112 ind211 ind212);
+  ind111 = a11*b11;
+  ind112 = a11*b12;
+  ind211 = a12*b11;
+  ind212 = a12*b12;
+  
+  !Mediator = Medium;
+  NEW(ind121 ind122 ind221 ind222);
+  ind121 = a21*b21;
+  ind122 = a21*b22;
+  ind221 = a22*b21;
+  ind222 = a22*b22;
+
+  !Mediator = Group;
+  NEW(ind131 ind132 ind231 ind232);
+  ind131 = a31*b31;
+  ind132 = a31*b32;
+  ind231 = a32*b31;
+  ind232 = a32*b32;
+  
+  !Mediator = Appear;
+  NEW(ind141 ind142 ind241 ind242);
+  ind141 = a41*b41;
+  ind142 = a41*b42;
+  ind241 = a42*b41;
+  ind242 = a42*b42;
+  
+  !Mediator = Body;
+  NEW(ind151 ind152 ind251 ind252);
+  ind151 = a51*b51;
+  ind152 = a51*b52;
+  ind251 = a52*b51;
+  ind252 = a52*b52;
+   
+OUTPUT:
+sampstat cinterval (bcbootstrap); ! bias-corrected bootstrap
+PLOT:
+type=plot2;
