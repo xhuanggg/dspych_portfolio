@@ -1,0 +1,343 @@
+---
+title: "p07"
+author: "Thomas Huang"
+date: "2026-05-03"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("/Users/roberthuang/Desktop/Wake/Spring 2026/DSPsych/dspych_portfolio/p07")
+```
+
+This portflio piece does different kinds of automated bivariate association tests for an exploratory project. Being automated means there is no need to running the tests one by one. Instead, it can return the test results with Bonferroni correction and export the results in Excel sheets just by inputting the IVs and DV. 
+
+This piece runs Pearson's r (continuous IV and DV), ANOVA (categorical IV and continuous DV), and chi-square test (categorical IV and DV).
+
+# Load packages and data
+
+```{r}
+library(tidyverse);library(vcd);library(gmodels);library(openxlsx);library(Hmisc);library(car);library(MOTE)
+load("merged_650_r.RData")
+```
+
+# Pearson's r
+
+Pearson's r is easy in this case. There is a ready-made function that takes a data frame and returns a correlation matrix.
+
+## Subset data
+
+```{r}
+x <- merged_650_r
+
+x <- x %>% 
+  dplyr::select(mCO1_ImpactOnRelationship, mCO1_ImpactOnLGBTQ, # Two DVs
+                mAge, mSex, mEthnicMinority, mOnlyChild, mSingle:mRelationshipStatus_Other, mAttitudeByProvince, mSocialLadder,
+                mCO1_OtherGender, mCO1_Age, mCO1_Medium_1:mCO1_Medium_888, mCO1_Context_1:mCO1_Context_888, mCO1_Closeness,
+                mCO1_Strategy_1:mCO1_Strategy_5_31) # IVs
+```
+
+## Calculate correlation matrix
+
+```{r}
+x <- as.data.frame(lapply(x, function(col) as.numeric(haven::zap_labels(col))))
+numeric <- data.matrix(x)
+corrmatrix_pearson <- Hmisc::rcorr(numeric)
+```
+
+## View correlation coefficient
+
+```{r}
+r <- round(corrmatrix_pearson$r,2) %>% 
+  as.data.frame 
+r <- select(r, mCO1_ImpactOnRelationship, mCO1_ImpactOnLGBTQ) # Select the two columns that are the two continuous outcomes.
+r <- r[-c(1, 2), ] # Drop the first and second rows that are the two outcomes
+r
+```
+
+## View p-value
+
+```{r}
+p <- corrmatrix_pearson$P %>%
+  as.data.frame 
+p <- select(p, mCO1_ImpactOnRelationship, mCO1_ImpactOnLGBTQ) # Select the two columns that are the two continuous outcomes.
+p <- p[-c(1, 2), ] # Drop the first and second rows that are the two outcomes.
+
+# Conduct Bonferroni correction.
+p_adj <- mutate_all(p, function(x) x * (3*85)) # There are 3*85 comparisons (Three outcomes and 85 predictors).
+
+# Convert p-values larger than 1 into ">.999"
+p$mCO1_ImpactOnRelationship <- ifelse(p$mCO1_ImpactOnRelationship >.999, 
+                                            ">.999", 
+                                          ifelse(p$mCO1_ImpactOnRelationship <.001, 
+                                                    "<.001", 
+                                                    round(p$mCO1_ImpactOnRelationship, 3)
+                                              )
+                                          )
+
+p$mCO1_ImpactOnLGBTQ <- ifelse(p$mCO1_ImpactOnLGBTQ >.999, 
+                              ">.999", 
+                              ifelse(p$mCO1_ImpactOnLGBTQ <.001, 
+                                      "<.001", 
+                                      round(p$mCO1_ImpactOnLGBTQ, 3)
+                                )
+  )
+
+p_adj$mCO1_ImpactOnRelationship <- ifelse(p_adj$mCO1_ImpactOnRelationship >.999, 
+                                            ">.999", 
+                                          ifelse(p_adj$mCO1_ImpactOnRelationship <.001, 
+                                                    "<.001", 
+                                                    round(p_adj$mCO1_ImpactOnRelationship, 3)
+                                              )
+                                          )
+
+p_adj$mCO1_ImpactOnLGBTQ <- ifelse(p_adj$mCO1_ImpactOnLGBTQ >.999, 
+                              ">.999", 
+                              ifelse(p_adj$mCO1_ImpactOnLGBTQ <.001, 
+                                      "<.001", 
+                                      round(p_adj$mCO1_ImpactOnLGBTQ, 3)
+                                )
+  )
+p
+
+p_adj #Bonferroni-corrected p
+```
+
+## View sample sizes after listwise deletion
+
+```{r}
+n <- round(corrmatrix_pearson$n,1) %>% 
+  as.data.frame
+n <- select(n, mCO1_ImpactOnRelationship, mCO1_ImpactOnLGBTQ) # Select the two columns that are the two continuous outcomes.
+n <- n[-c(1, 2), ] # Drop the first and second rows that are the two outcomes
+n
+```
+
+## Create an Excel sheet
+
+```{r}
+Pearson_r.table <- data.frame(
+  variables = rownames(r),
+  r_mCO1_ImpactOnRelationship = r$mCO1_ImpactOnRelationship,
+  p_mCO1_ImpactOnRelationship = p$mCO1_ImpactOnRelationship,
+  padj_mCO1_ImpactOnRelationship = p_adj$mCO1_ImpactOnRelationship,
+  n_mCO1_ImpactOnRelationship = n$mCO1_ImpactOnRelationship,
+  r_mCO1_ImpactOnLGBTQ = r$mCO1_ImpactOnLGBTQ,
+  p_mCO1_ImpactOnLGBTQ = p$mCO1_ImpactOnLGBTQ,
+  padj_mCO1_ImpactOnLGBTQ = p_adj$mCO1_ImpactOnLGBTQ,
+  n_mCO1_ImpactOnLGBTQ = n$mCO1_ImpactOnLGBTQ
+)
+
+# Save the table S7 to excel sheet
+write.xlsx(Pearson_r.table, "Pearson_r.table.xlsx")
+```
+
+# ANOVA
+
+There is no ready-made automation functions. So I will define a function and a loop. The function will return test statistics, two df's, effect size, p value, and Bonferroni corrected p values.
+
+## Subset data
+
+```{r}
+df_anova <- merged_650_r
+df_anova <- df_anova %>% 
+  dplyr::select(
+    mCO1_ImpactOnRelationship, mCO1_ImpactOnLGBTQ,
+    mDegree, mEmployment, mSocialAssistance,
+    mCO1_SexualOrientation, mCO1_Relationship, mCO1_Number_Perceivers, mCO1_Occasion, mCO1_Venue, mCO1_Dialogue, 
+    mCO1_Suspect, mCO1_Imagine, mCO1_Hope
+  ) %>%
+  as_factor() %>% 
+  mutate(
+    mCO1_ImpactOnRelationship = as.numeric(mCO1_ImpactOnRelationship)
+  )
+
+glimpse(df_anova)
+
+# Create a df with all IVs but without the DV
+df_anova_r <- df_anova %>% 
+  dplyr::select(-mCO1_ImpactOnRelationship, -mCO1_ImpactOnLGBTQ)
+```
+
+## Define function and loop
+
+```{r results='hide'}
+ANOVA.table <- data.frame(
+  variable = character(0),
+  df1 = numeric(0),
+  df2 = numeric(0),
+  f = numeric(0),
+  p = numeric(0),
+  adjusted_p = numeric(0),
+  omega2 = numeric(0)
+)
+
+for (var_i in colnames(df_anova_r)){
+  print(paste("===============================", var_i, "==============================="))
+  df <- df_anova
+  x <- df[[var_i]]
+  y <- df_anova$mCO1_ImpactOnRelationship
+
+  # Perform ANOVA
+  model <- lm(y ~ x, data=df)  
+  anova_result <- Anova(model, type="III")
+  
+  # Print degrees of freedom
+  df1 <- anova_result$`Df`[2]
+  df1
+  df2 <- anova_result$`Df`[3]
+  df2
+  
+  # Print F-value
+  f <- round(anova_result$`F value`[2], 2)
+  f
+  
+  # Print p-value
+  p <- ifelse(anova_result$`Pr(>F)`[2] > .999, 
+                                ">.999", 
+                                ifelse(anova_result$`Pr(>F)`[2] <.001, 
+                                       "<.001", 
+                                        round(anova_result$`Pr(>F)`[2], 3)
+                                 )
+   )
+  p
+  
+  # Perform Bonferroni correction
+  adjusted_p <- anova_result$`Pr(>F)`[2] * (3 * 85)
+  adjusted_p <- ifelse(adjusted_p > .999, 
+                                ">.999", 
+                                ifelse(adjusted_p <.001, 
+                                        "<.001", 
+                                        round(adjusted_p, 3)
+                                 )
+  )
+  adjusted_p
+  
+  # Calculate omega squared
+  model <- aov(y ~ x, data=df)  
+  SS_b <- summary(model)[[1]]$`Sum Sq`[1]  # Sum of squares between groups
+  df_b <- summary(model)[[1]]$Df[1]       # Degrees of freedom between groups
+  SS_w <- summary(model)[[1]]$`Sum Sq`[2]  # Sum of squares within groups
+  df_w <- summary(model)[[1]]$Df[2]       # Degrees of freedom within groups
+  MS_w <- SS_w / df_w                     # Mean square within groups
+  omega2 <- (SS_b - df_b * MS_w) / (SS_b + SS_w + MS_w)
+  omega2 <- round(omega2, 3)
+
+  # Combine the row (two dfs and some values) to a blank df
+  ANOVA.table_row <- cbind(var_i, df1, df2, f, p, adjusted_p, omega2)
+  
+  names(ANOVA.table_row) <- names(ANOVA.table)
+
+  ANOVA.table <- rbind(ANOVA.table, ANOVA.table_row)
+  glimpse(ANOVA.table) 
+}
+```
+
+## Create an Excel sheet
+
+```{r}
+ANOVA.table
+
+# Save the table S7 to excel sheet
+write.xlsx(ANOVA.table, "ANOVA.table.xlsx")
+```
+
+# Chi-square tests
+
+Similar to the ANOVAs, I defined a function and a loop that do the magic.
+
+## Subset data
+
+```{r}
+df_chisq <- merged_650_r %>% 
+  dplyr::select(
+                mSex, mEthnicMinority, mOnlyChild, mDegree, mSingle:mWidowed, mRelationshipStatus_Other,
+                mEmployment, mSocialAssistance, 
+                mCO1_OtherGender:mCO1_Strategy_5_31
+  ) %>% 
+  dplyr::select(-mWidowed,
+                -mCO1_SexualOrientation_TEXT, -mCO1_Context_Other_TEXT, -mCO1_Reaction_Other_TEXT,
+                -mCO1_Age,-(mCO1_Reaction_1:mCO1_ImpactOnLGBTQ)
+  )
+glimpse(df_chisq)
+```
+
+## Define a function and a loop
+
+```{r results='hide'}
+chi.table <- data.frame(
+  variable = character(0),
+  chisq = numeric(0),
+  p = numeric(0),
+  adjusted_p = numeric(0),
+  cramer = numeric(0)
+)
+
+for (var_i in colnames(df_chisq)){
+  print(paste("===============================", var_i, "==============================="))
+  df <- df_chisq
+  x <- df[[var_i]]
+  y <- merged_650_r$mCO1_Reaction_LCA_class
+
+  # Run Chi-Sq analysis
+  # Use tryCatch to handle errors
+result <- tryCatch(
+  {
+    CrossTable(table(x,y),expected=T,prop.r=F,prop.c=T,prop.t=F,prop.chisq=F,chisq=T,fisher=T,format="SPSS")
+  },
+  error = function(e) {
+    # If an error occurs
+    CrossTable(table(x,y),expected=T,prop.r=F,prop.c=T,prop.t=F,prop.chisq=F,chisq=T,simulate.p.value=TRUE, format="SPSS")
+  }
+)
+  
+
+  # Create a contingency table
+  chi_sq_result <- table(x, y) %>%
+    chisq.test()
+
+  p_value <- ifelse(chi_sq_result$p.value > .999, 
+                              ">.999", 
+                              ifelse(chi_sq_result$p.value <.001, 
+                                      "<.001", 
+                                      round(chi_sq_result$p.value, 3)
+                                )
+  )
+
+  # Conduct Bonferroni correction
+  adjusted_p_value <- chi_sq_result$p.value * (3 * 85)
+  adjusted_p_value <- ifelse(adjusted_p_value > .999, 
+                              ">.999", 
+                              ifelse(adjusted_p_value <.001, 
+                                      "<.001", 
+                                      round(adjusted_p_value, 3)
+                                )
+  )
+
+  # Print the adjusted p-value
+  print(adjusted_p_value)
+
+  # Calculate Cramer's V
+  tab1 <- gmodels::CrossTable(x,y)
+  chisq_summary <- vcd::assocstats(tab1$t)
+  chisq_value <- round(chisq_summary$chisq_tests["Pearson", "X^2"], 2)
+  cramer_value <- round(chisq_summary$cramer, 2)
+
+    # Combind the row (two dfs and some values) to a blank df
+  chi.table_row <- cbind(var_i, chisq_value, p_value, adjusted_p_value, cramer_value)
+  
+  names(chi.table_row) <- names(chi.table)
+
+  chi.table <- rbind(chi.table, chi.table_row)
+  glimpse(chi.table) 
+}
+```
+
+## Create an Excel sheet
+
+```{r}
+chi.table
+
+# Save the table S7 to excel sheet
+write.xlsx(chi.table, "chi.table.xlsx")
+```

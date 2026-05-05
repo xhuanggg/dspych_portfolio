@@ -1,0 +1,19 @@
+TITLE:
+Experiences of Discrimination CFA;
+DATA:
+FILE = "discrim_cfa.dat"; 
+VARIABLE:
+NAMES = Discrim1 Discrim2 Discrim3 Discrim4 Discrim5; 
+ MISSING=.;
+ usevar = 
+    Discrim1-Discrim5;
+ANALYSIS:
+estimator = MLR;
+    processors = 20;
+MODEL:
+discrim by Discrim1-Discrim5; ! *free factor loading
+    discrim by Discrim1@1;
+OUTPUT:
+sampstat standardized;
+PLOT:
+type=plot2;
