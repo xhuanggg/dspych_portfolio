@@ -2,7 +2,7 @@
 title: "Replicating a two-way ANOVA in a regression"
 author: "Thomas Huang"
 date: "2026-04-02"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
