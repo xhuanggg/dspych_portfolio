@@ -1,0 +1,112 @@
+---
+title: "p10"
+author: "Thomas Huang"
+date: "2026-05-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("/Users/roberthuang/Desktop/Wake/Spring 2026/DSPsych/dspych_portfolio/p10")
+```
+
+This portfilio piece aims to investigate a classic topic in marketing: whether people think neagtive or positive are more useful. To answer this question, I used a slice of Yelp's open dataset, US restaurant reviews in July 2019. I did not use the full dataset. Otherwise, my laptop would freak out.
+
+My MO is to find out whether a review is positive or negativw through text analysis with quanteda and then test whether people marked them as useful.
+
+# Load packages and data
+
+```{r}
+library(tidyverse);library(quanteda);library(quanteda.textstats)
+
+load('yelp.cleaned.RData')
+glimpse(yelp.cleaned)
+```
+
+# Text analysis
+## Preprocessing
+
+```{r}
+review.cp <- corpus(yelp.cleaned$text,
+                  docvars = yelp.cleaned$Code)
+
+summary(review.cp, 5)
+
+# Tokenization
+token.clean <- review.cp %>% 
+  quanteda::tokens(remove_punct = TRUE, 
+                   remove_numbers = TRUE) %>%
+  tokens_tolower() %>%
+  tokens_remove(stopwords("en")) 
+
+# Create a DFM
+review_dfm <- dfm(token.clean)
+```
+
+## Sentiment analysis
+
+I'm running sentiment analysis by comparing the tokens with a dictionary that marks each token as positive, neutral, or negative.
+
+```{r}
+data("data_dictionary_LSD2015")
+
+sent_score.dfm <- dfm_lookup(review_dfm,
+                                    dictionary = data_dictionary_LSD2015) 
+
+sent_score <- convert(sent_score.dfm, to = "data.frame")
+
+yelp.cleaned <- sent_score %>% 
+  dplyr::mutate(Code = 1:83286) %>%
+  dplyr::select(negative,positive, Code) %>% 
+  left_join(yelp.cleaned, by = "Code") %>%
+  relocate(negative:positive, .after = last_col())
+```
+
+# See how sentiment predicts useful rating
+
+```{r}
+model <- lm(useful ~ negative + positive, data = yelp.cleaned)
+summary(model)
+```
+
+This simple model tells that both positive and negative sentiments positively predicted useful ratings. I would like to add some covariates
+
+# Calculate the length of reviews
+
+```{r}
+yelp.cleaned <- textstat_summary(review.cp) %>% 
+  dplyr::mutate(Code = 1:83286) %>% 
+  dplyr::select(Code, chars) %>%
+  left_join(yelp.cleaned, by = "Code") %>%
+  relocate(chars, .after = last_col())
+```
+
+# Calculate diversity score (TTR)
+
+```{r}
+yelp.cleaned <- textstat_lexdiv(
+  review_dfm,
+  measure = "TTR",
+  remove_numbers = TRUE,
+  remove_punct = TRUE,
+  remove_symbols = TRUE,
+  remove_hyphens = FALSE,
+  log.base = 10,
+  MATTR_window = 100L,
+  MSTTR_segment = 100L
+) %>% 
+  as.data.frame() %>%
+  dplyr::mutate(Code = 1:83286) %>% 
+  dplyr::select(Code, TTR) %>%
+  left_join(yelp.cleaned, by = "Code") %>%
+  relocate(TTR, .after = last_col())
+```
+
+# Run a more complex model
+
+```{r}
+model2 <- lm(useful ~ negative + positive + chars*negative + chars*positive + TTR, data = yelp.cleaned)
+summary(model2)
+```
+
+Here are some more interesting findings. After controlling for length and diversity score, negative sentiment predicted higher usefulness ratings, but positive sentiment had little effect on usefulness ratings. But if a negative review gets longer, the usefulness rating is predicted to decrease. In contrast, if a positive review gets longer, the usefulness rating is predicted to increase.
