@@ -7,7 +7,6 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-setwd("/Users/roberthuang/Desktop/Wake/Spring 2026/DSPsych/dspych_portfolio/p09")
 ```
 
 In this piece, I'm predicting whether individuals would purchase a discounted premium membership at a supermarket with random forest. This is the soruce of my dataset: https://www.kaggle.com/datasets/ahsan81/superstore-marketing-campaign-dataset/data.

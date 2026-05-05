@@ -7,7 +7,6 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-setwd("/Users/roberthuang/Desktop/Wake/Spring 2026/DSPsych/dspych_portfolio/p10")
 ```
 
 This portfilio piece aims to investigate a classic topic in marketing: whether people think neagtive or positive are more useful. To answer this question, I used a slice of Yelp's open dataset, US restaurant reviews in July 2019. I did not use the full dataset. Otherwise, my laptop would freak out.

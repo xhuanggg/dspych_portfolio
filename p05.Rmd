@@ -7,7 +7,6 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-setwd("/Users/roberthuang/Desktop/Wake/Spring 2026/DSPsych/dspych_portfolio/p05")
 ```
 
 The cool thing with this project is that it replicates the exact results of a two-way ANOVA.
@@ -16,7 +15,7 @@ The cool thing with this project is that it replicates the exact results of a tw
 
 ```{r}
 library(tidyverse);library(MplusAutomation);library(here)
-load("df.RData")
+load("df_p5.RData")
 
 colnames(df)
 ```

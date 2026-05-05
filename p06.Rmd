@@ -7,7 +7,6 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-setwd("/Users/roberthuang/Desktop/Wake/Spring 2026/DSPsych/dspych_portfolio/p06")
 ```
 
 This portfolio piece is an improvement / extensions of the model reported in this poster: https://drive.google.com/file/d/1nnV-cHYAQVcc5l6ge7PP3fHaVXDlSpSQ/view?usp=sharing.

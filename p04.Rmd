@@ -9,7 +9,6 @@ This portfolio piece is part of my data analysis for my thesis. This piece deals
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-setwd("/Users/roberthuang/Desktop/Wake/Spring 2026/DSPsych/dspych_portfolio/p04")
 ```
 
 ## Packages and data
@@ -17,7 +16,7 @@ setwd("/Users/roberthuang/Desktop/Wake/Spring 2026/DSPsych/dspych_portfolio/p04"
 ```{r}
 library(tidyverse);library(readxl);library(psych);library(emmeans);library(effectsize)
 
-df <- read_excel("data.xlsx")
+df <- read_excel("data_p4.xlsx")
 fail_check <- read_excel("Fail_Check.xlsx")
 ```
 

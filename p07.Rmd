@@ -7,7 +7,6 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-setwd("/Users/roberthuang/Desktop/Wake/Spring 2026/DSPsych/dspych_portfolio/p07")
 ```
 
 This portflio piece does different kinds of automated bivariate association tests for an exploratory project. Being automated means there is no need to running the tests one by one. Instead, it can return the test results with Bonferroni correction and export the results in Excel sheets just by inputting the IVs and DV. 
