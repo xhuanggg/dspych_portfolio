@@ -2,7 +2,7 @@
 title: "p08"
 author: "Thomas Huang"
 date: "2026-05-02"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
