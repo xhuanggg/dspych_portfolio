@@ -1,0 +1,243 @@
+---
+title: "p08"
+author: "Thomas Huang"
+date: "2026-05-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("/Users/roberthuang/Desktop/Wake/Spring 2026/DSPsych/dspych_portfolio/p08")
+```
+
+This portfolio piece analyzes data of a consumer behavior project. The project is a rough sketch of an idea to test how consumers would decide under time or quantity scarcity. Participants were randomly assigned to one of the four conditions. In each condition, participants were asked to choose one of the two hotels for their holiday. Hotel A displays a scarcity cue (will be discussed later) and Hotel B has mostly nothing special. The goal is to test whether certain features of Hotel A would appeal to participants. Participants were asked three questions (dependent measures) plus an attention check item. The three measures were the participant's decision, their intention to choose Hotel A, and the attractiveness of Hotel A. The attention check item asked the participants to recall the discount of Hotel A. Personally speaking, this attention check is too hard. As a matter of fact, I think whether participants could pass it might be related to the condition they were assigned to, which introduced a confound.
+
+In conditions 1 and 2 (C1 and C2), both hotels were 1 mile away from the destination. In C1, Hotel A had a quantity scarcity cue, something like only three rooms left. In C2, Hotel A had a time scarcity cue, something like promotions ends tonight. 
+
+In conditions 3 and 4 (C3 and C4), the distance from the hotels to the destination was manipulated. Hotel A was 1 mile away but Hotel B was 12 miles away from the destination. Similar to C1 and C2, Hotel A had a quantity scarcity cue in C3 and Hotel A had a time scarcity cue in C4.
+
+It's obvious that this pilot study is problematic. The biggest issue is lacking a baseline condition where both hotels display no scarcity cues. This makes the interpretation of the data extremely difficult. 
+
+However, I had no involvement in experiment design and this is what I have. So I have to make the most of it.
+
+# Load packages and data
+
+```{r}
+library(tidyverse);library(readxl);library(psych);library(vcd);library(gmodels)
+df <- read_excel("data.xlsx")
+glimpse(df)
+```
+
+# Merge variables
+
+```{r}
+conds <- c("C1", "C2", "C3", "C4")
+items <- c("Decision", "Intention", "Attract")
+
+for (item in items) {
+  
+  cols <- paste0(item, "_", conds)
+  
+  # combined response
+  df[[item]] <- coalesce(!!!df[cols])
+  
+  # condition per item
+  df[[paste0(item, "_C")]] <- conds[
+    max.col(!is.na(df[cols]), ties.method = "first")
+  ]
+}
+
+df <- df %>%
+  mutate(C = Decision_C)
+
+df <- df %>%
+  select(-ends_with("_C")) %>%
+  select(-matches("_(C1|C2|C3|C4)$"))
+
+glimpse(df)
+
+df$C <- as.factor(df$C)
+
+df_r <- df
+```
+
+# Exclude participants who failed attention checks
+
+```{r}
+df <- df %>% 
+  filter(str_detect(AC_Discount, "20"))
+
+glimpse(df) #N = 368.
+```
+
+# Check if the rate of failing attention check is the same across conditions
+
+Cool, the attention check was hard. But it did not introduce a confound.
+```{r}
+df_r$AC_result <- ifelse(str_detect(df_r$AC_Discount, "20"), 1, 0)
+
+# Chi-square test
+CrossTable(table(df_r$AC_result, df_r$C),expected=T,prop.r=F,prop.c=T,prop.t=F,prop.chisq=F,chisq=T,fisher=T,format="SPSS")
+```
+
+# Descriptives
+
+```{r}
+table(df$Gender)
+psych::describe(df$Age)
+table(df$C)
+
+table(df$Decision, df$C)
+psych::describeBy(df$Intention, df$C)
+psych::describeBy(df$Attract, df$C)
+```
+
+# Omnibus effects
+
+```{r}
+# Decisions
+CrossTable(table(df$Decision, df$C),expected=T,prop.r=F,prop.c=T,prop.t=F,prop.chisq=F,chisq=T,fisher=T,format="SPSS")
+
+# Intention
+Intention.aov <- lm(Intention ~ C, data = df)
+summary(Intention.aov)
+
+# Attractiveness
+Attract.aov <- lm(Attract ~ C, data = df)
+summary(Attract.aov)
+```
+
+# Main effect of distance
+
+```{r}
+df <- df %>%
+  mutate(distance = case_when(
+    C == "C1" ~ 0,
+    C == "C2" ~ 0,
+    C == "C3" ~ 1,
+    C == "C4" ~ 1,
+  )) %>% 
+  mutate(
+    distance = as.factor(distance)
+  )
+
+# Intention
+t.test(Intention ~ distance, data = df)
+
+# Attractiveness
+t.test(Attract ~ distance, data = df)
+```
+
+# Which cue was more appealing without an advantage in distance?
+
+```{r}
+df_h1 <- df %>% 
+  filter(C == "C1" | C == "C2")
+
+df_h1$Condition <- ifelse(df_h1$C == "C1", 1, 0)
+
+# Decisions
+CrossTable(table(df_h1$Decision, df_h1$Condition),expected=T,prop.r=F,prop.c=T,prop.t=F,prop.chisq=F,chisq=T,fisher=T,format="SPSS")
+
+# Intention
+t.test(Intention ~ Condition, data = df_h1)
+
+# Attractiveness
+t.test(Attract ~ Condition, data = df_h1)
+```
+
+# Which cue was more appealing with an advantage in distance?
+
+```{r}
+df_h2 <- df %>% 
+  filter(C == "C3" | C == "C4")
+
+df_h2$Condition <- ifelse(df_h2$C == "C3", 1, 0)
+
+# Decisions
+CrossTable(table(df_h2$Decision, df_h2$Condition),expected=T,prop.r=F,prop.c=T,prop.t=F,prop.chisq=F,chisq=T,fisher=T,format="SPSS")
+
+# Intention
+t.test(Intention ~ C, data = df_h2)
+
+# Attractiveness
+t.test(Attract ~ C, data = df_h2) #The result of this test was significant. But I would rather believe this is due to inflated family-wise Type I error rate because of multiple comparisons.
+```
+
+The results indicated that he difference in the effect of a quantity scarcity cue and that of a time scarcity cue was minimal with and without a distance advantage. There are two possibilities. First, the effect of a scarcity cue is minimal. Individuals may make similar decisions regardless of scarcity cues in hotel booking. Second, both quantity and time scarcity cues nudge individuals to decide, but their effects are largely the same. But I cannot tell what's going on because of an absence of a baseline condition. Based on what we have, participants’ decisions were mostly shaped by distance advantage.
+
+I also performed a sensitivity analysis by include participants who failed attention check. It replicated the results of excluding them.
+
+# Sensitivity analysis: Include participants who failed attention check
+## Omnibus effects
+
+```{r}
+# Decisions
+CrossTable(table(df_r$Decision, df_r$C),expected=T,prop.r=F,prop.c=T,prop.t=F,prop.chisq=F,chisq=T,fisher=T,format="SPSS")
+
+# Intention
+Intention.aov2 <- lm(Intention ~ C, data = df_r)
+summary(Intention.aov2)
+
+# Attractiveness
+Attract.aov2 <- lm(Attract ~ C, data = df_r)
+summary(Attract.aov2)
+```
+
+## Main effect of distance
+
+```{r}
+df_r <- df_r %>%
+  mutate(distance = case_when(
+    C == "C1" ~ 0,
+    C == "C2" ~ 0,
+    C == "C3" ~ 1,
+    C == "C4" ~ 1,
+  )) %>% 
+  mutate(
+    distance = as.factor(distance)
+  )
+
+# Intention
+t.test(Intention ~ distance, data = df_r)
+
+# Attractiveness
+t.test(Attract ~ distance, data = df_r)
+```
+
+## H1
+
+```{r}
+df_h1 <- df_r %>% 
+  filter(C == "C1" | C == "C2")
+
+df_h1$Condition <- ifelse(df_h1$C == "C1", 1, 0)
+
+# Decisions
+CrossTable(table(df_h1$Decision, df_h1$Condition),expected=T,prop.r=F,prop.c=T,prop.t=F,prop.chisq=F,chisq=T,fisher=T,format="SPSS")
+
+# Intention
+t.test(Intention ~ Condition, data = df_h1)
+
+# Attractiveness
+t.test(Attract ~ Condition, data = df_h1)
+```
+
+## H2
+
+```{r}
+df_h2 <- df_r %>% 
+  filter(C == "C3" | C == "C4")
+
+df_h2$Condition <- ifelse(df_h2$C == "C3", 1, 0)
+
+# Decisions
+CrossTable(table(df_h2$Decision, df_h2$Condition),expected=T,prop.r=F,prop.c=T,prop.t=F,prop.chisq=F,chisq=T,fisher=T,format="SPSS")
+
+# Intention
+t.test(Intention ~ C, data = df_h2)
+
+# Attractiveness
+t.test(Attract ~ C, data = df_h2)
+```
+
