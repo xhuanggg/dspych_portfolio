@@ -1,20 +1,112 @@
 ---
-title: "Portfolio 10"
+title: "p10"
+author: "Thomas Huang"
+date: "2026-05-05"
+output: github_document
 ---
 
-> The projects should be numbered consecutively (i.e., in the order in which you began them), and should include for each project a description of the goal, the product (computer program, hand graph, computer graph, etc.), the data, and some interpretation. Reports must be reproducible and of high quality in terms of writing, grammar, presentation, etc.
-
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed hendrerit purus ut dapibus vestibulum. Suspendisse potenti. Cras faucibus mauris in leo condimentum lobortis. Cras euismod sollicitudin augue, ut venenatis quam placerat eu. Maecenas vulputate rhoncus odio, in interdum risus malesuada gravida. Maecenas cursus sed dui sit amet lacinia. Nunc dignissim metus nec ex mattis, non rutrum urna cursus. Morbi pretium elementum purus, in aliquet libero eleifend ac. Nam finibus, ligula sed ultrices pharetra, tellus risus consequat tortor, facilisis maximus elit lectus a metus. Sed vel dictum nulla, vitae blandit turpis. Integer pulvinar tempor diam ac venenatis. Vestibulum est lacus, suscipit et ipsum nec, consectetur iaculis leo. Morbi libero lacus, scelerisque non sollicitudin vitae, accumsan sed tellus. Suspendisse quis orci tellus.
-
-
-```{r, child='p10/demo.Rmd'}
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("/Users/roberthuang/Desktop/Wake/Spring 2026/DSPsych/dspych_portfolio/p10")
 ```
 
+This portfilio piece aims to investigate a classic topic in marketing: whether people think neagtive or positive are more useful. To answer this question, I used a slice of Yelp's open dataset, US restaurant reviews in July 2019. I did not use the full dataset. Otherwise, my laptop would freak out.
 
-Aliquam sed ex et lorem consequat feugiat at porta leo. Fusce id hendrerit tellus. Maecenas dictum felis neque, quis dictum metus tristique eu. Vivamus sed blandit nisl. Integer ut urna dolor. Cras in egestas eros, in aliquam nisi. Duis vitae elementum quam. Vivamus vel turpis commodo, porttitor urna vitae, viverra sem. Nam nec dignissim erat, id viverra libero. Integer vel lectus pellentesque tortor fringilla posuere. Vivamus quis magna accumsan, porta tortor at, aliquam urna. Aliquam vestibulum ante massa, ut gravida lectus sagittis vitae.
+My MO is to find out whether a review is positive or negativw through text analysis with quanteda and then test whether people marked them as useful.
 
-Sed eget ipsum auctor, gravida magna sit amet, tincidunt mi. Nulla erat ante, volutpat nec sem eget, luctus posuere est. Praesent convallis nunc ac turpis bibendum, in maximus magna convallis. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Sed sit amet nulla ante. Sed elit sem, lobortis nec nisi a, rhoncus ornare nunc. Curabitur ultrices neque feugiat, facilisis magna eu, consectetur magna. Mauris id eleifend ex.
+# Load packages and data
 
-Morbi tincidunt mollis odio sit amet feugiat. Ut vel risus eu ante dictum consequat. Integer et luctus mauris. Donec nec faucibus urna, sed commodo risus. Nam elementum pulvinar erat, eget convallis est blandit vel. Etiam gravida sapien eu massa hendrerit maximus. Proin dolor quam, porta vitae libero non, venenatis porta tellus. Vivamus et elit a est aliquet consequat. Proin tempus, purus quis suscipit placerat, dui nunc euismod dui, sit amet luctus leo lectus in risus. Phasellus consectetur eleifend arcu. Nullam venenatis blandit nulla ut ullamcorper. Vestibulum eu arcu quis massa scelerisque sodales in ac augue. Quisque dapibus fringilla turpis, ut cursus tortor cursus sed. Sed facilisis quam eget neque viverra venenatis. Suspendisse ut lorem nec erat elementum bibendum. Curabitur lobortis purus in cursus blandit.
+```{r}
+library(tidyverse);library(quanteda);library(quanteda.textstats)
 
+load('yelp.cleaned.RData')
+glimpse(yelp.cleaned)
+```
+
+# Text analysis
+## Preprocessing
+
+```{r}
+review.cp <- corpus(yelp.cleaned$text,
+                  docvars = yelp.cleaned$Code)
+
+summary(review.cp, 5)
+
+# Tokenization
+token.clean <- review.cp %>% 
+  quanteda::tokens(remove_punct = TRUE, 
+                   remove_numbers = TRUE) %>%
+  tokens_tolower() %>%
+  tokens_remove(stopwords("en")) 
+
+# Create a DFM
+review_dfm <- dfm(token.clean)
+```
+
+## Sentiment analysis
+
+I'm running sentiment analysis by comparing the tokens with a dictionary that marks each token as positive, neutral, or negative.
+
+```{r}
+data("data_dictionary_LSD2015")
+
+sent_score.dfm <- dfm_lookup(review_dfm,
+                                    dictionary = data_dictionary_LSD2015) 
+
+sent_score <- convert(sent_score.dfm, to = "data.frame")
+
+yelp.cleaned <- sent_score %>% 
+  dplyr::mutate(Code = 1:83286) %>%
+  dplyr::select(negative,positive, Code) %>% 
+  left_join(yelp.cleaned, by = "Code") %>%
+  relocate(negative:positive, .after = last_col())
+```
+
+# See how sentiment predicts useful rating
+
+```{r}
+model <- lm(useful ~ negative + positive, data = yelp.cleaned)
+summary(model)
+```
+
+This simple model tells that both positive and negative sentiments positively predicted useful ratings. I would like to add some covariates
+
+# Calculate the length of reviews
+
+```{r}
+yelp.cleaned <- textstat_summary(review.cp) %>% 
+  dplyr::mutate(Code = 1:83286) %>% 
+  dplyr::select(Code, chars) %>%
+  left_join(yelp.cleaned, by = "Code") %>%
+  relocate(chars, .after = last_col())
+```
+
+# Calculate diversity score (TTR)
+
+```{r}
+yelp.cleaned <- textstat_lexdiv(
+  review_dfm,
+  measure = "TTR",
+  remove_numbers = TRUE,
+  remove_punct = TRUE,
+  remove_symbols = TRUE,
+  remove_hyphens = FALSE,
+  log.base = 10,
+  MATTR_window = 100L,
+  MSTTR_segment = 100L
+) %>% 
+  as.data.frame() %>%
+  dplyr::mutate(Code = 1:83286) %>% 
+  dplyr::select(Code, TTR) %>%
+  left_join(yelp.cleaned, by = "Code") %>%
+  relocate(TTR, .after = last_col())
+```
+
+# Run a more complex model
+
+```{r}
+model2 <- lm(useful ~ negative + positive + chars*negative + chars*positive + TTR, data = yelp.cleaned)
+summary(model2)
+```
+
+Here are some more interesting findings. After controlling for length and diversity score, negative sentiment predicted higher usefulness ratings, but positive sentiment had little effect on usefulness ratings. But if a negative review gets longer, the usefulness rating is predicted to decrease. In contrast, if a positive review gets longer, the usefulness rating is predicted to increase.

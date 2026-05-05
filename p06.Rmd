@@ -1,5 +1,548 @@
 ---
-title: "Portfolio 6"
+title: "p06"
+author: "Thomas Huang"
+date: "2026-05-03"
+output: github_document
 ---
 
-> The projects should be numbered consecutively (i.e., in the order in which you began them), and should include for each project a description of the goal, the product (computer program, hand graph, computer graph, etc.), the data, and some interpretation. Reports must be reproducible and of high quality in terms of writing, grammar, presentation, etc.
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("/Users/roberthuang/Desktop/Wake/Spring 2026/DSPsych/dspych_portfolio/p06")
+```
+
+This portfolio piece is an improvement / extensions of the model reported in this poster: https://drive.google.com/file/d/1nnV-cHYAQVcc5l6ge7PP3fHaVXDlSpSQ/view?usp=sharing.
+
+What's going on is to find out how promximal minority stressors, such as internalized homophobia and lack of LGBTQ+ affirmation, would predict distal stressors--discrimination through behavioral enactment of LGBTQ+ identity--acts of coming out.
+
+A critique of the model in the poster is using the count of specific coming-out strategies participants used in each of the five categories as mediators. Using counts of specific strategies is problematic for two reasons. First, participants were given more specific strategies to choose from in some categories and participants were given fewer specific strategies to choose from in other categories. Therefore, the scales of the counts are not uniform, which makes it harder to understand the coefficients. Second, using counts introduces a methodological confound. After indicating they had used strategies of a category, participants were given a given a list of specific strategies under a category and they reported the specific strategies they had used. Then, participants were asked a series of follow-up questions regarding each specific strategy they had used, such as whether they were comforable with using it. After this, participants were given a list of specific strategies of another category. Therefore, the problem is that participants might be annoyed by the number of follow-up questions if they reported using a lot of specific strategies. So they may simply report they had used fewer specific strategies as they got tired with the follow-up questions. 
+
+On top of that, I added internalized problems as another outcome variable.
+
+Thus, a simple solution to these concerns is to treat the mediators as dummy variables. This introduces some challenges. First, I need to calculate the indirect effects by specifying new variables that the product of a-paths and b-paths because there is not an off-the-rack indirect effect command for categorical mediators in mplus. Second, doing this requests a lot of computation. It takes more than three hours to run this model with a powerful mac. 
+
+# Load data and packages
+
+```{r}
+library(tidyverse);library(haven);library(broom);library(MplusAutomation);library(here)
+
+load("blued.RData")
+```
+
+# Parceling
+The predictors and the outcome are specified as latent variables. For better model fit, they were parceled.
+
+## Experiences of discrimination
+
+```{r}
+Discrim <- blued %>% 
+  dplyr::select(Discrim1:Discrim5)
+
+colnames(Discrim)
+```
+
+```{r}
+discrim_cfa  <- mplusObject(
+  
+  TITLE = "Experiences of Discrimination CFA;", 
+  
+  VARIABLE = 
+   "usevar = 
+    Discrim1-Discrim5;",          
+  
+  ANALYSIS =  
+   "estimator = MLR;
+    processors = 20;",
+  
+  MODEL = 
+   "discrim by Discrim1-Discrim5; ! *free factor loading
+    discrim by Discrim1@1;",
+  
+  OUTPUT = 
+    "sampstat standardized;",
+  
+  PLOT = "type=plot2;",
+  
+  usevariables = colnames(Discrim),   
+  rdata = Discrim)                    
+
+discrim_cfa_fit <- mplusModeler(discrim_cfa,
+                     dataout= "discrim_cfa.dat",       
+                    modelout= "discrim_cfa.inp",
+                    check=TRUE, run = TRUE, hashfilename = FALSE)
+```
+
+```{r}
+# Model fit
+discrim_cfa_fit_results <-  readModels("discrim_cfa.out")
+
+discrim_cfa_model_fit <- discrim_cfa_fit_results["summaries"] %>% 
+  as.data.frame() %>% 
+  rename_all(~stringr::str_replace(.,"summaries.","")) %>% 
+  dplyr::select(RMSEA_Estimate, CFI, TLI, AIC, BIC, aBIC)
+discrim_cfa_model_fit 
+
+# Standardized parameters
+discrim_cfa_loading.std <- discrim_cfa_fit_results[["parameters"]][["stdyx.standardized"]] %>% 
+  as.data.frame() 
+discrim_cfa_loading.std 
+```
+
+```{r}
+# Parceling
+discrim_cfa_loading.std.sorted <- discrim_cfa_loading.std %>% 
+  filter(paramHeader == 'DISCRIM.BY') %>% 
+  arrange(desc(est)) %>% 
+  dplyr::select(param, est)
+discrim_cfa_loading.std.sorted
+
+# Initialize the number of parcels
+num_parcels <- 3
+
+# Create empty lists to hold item names and a vector for loadings sum for each parcel
+parcels <- vector("list", num_parcels)
+parcels_loadings <- numeric(num_parcels)
+
+# Distribute items across parcels to balance the sum of loadings
+for (i in 1:nrow(discrim_cfa_loading.std.sorted)) {
+  # Find the parcel with the smallest sum of loadings
+  min_index <- which.min(parcels_loadings)
+  
+  # Add the current item to this parcel
+  parcels[[min_index]] <- c(parcels[[min_index]], discrim_cfa_loading.std.sorted$param[i])
+  parcels_loadings[min_index] <- parcels_loadings[min_index] + discrim_cfa_loading.std.sorted$est[i]
+}
+
+# Name parcels for clarity
+names(parcels) <- paste0("Parcel", 1:num_parcels)
+
+# Calculate and print the summed loadings for each parcel
+summed_loadings <- parcels_loadings
+names(summed_loadings) <- names(parcels)
+print(summed_loadings)
+
+# Output the results in a more readable format
+for (i in 1:num_parcels) {
+  cat(paste("Parcel", i, "contains items:", paste(parcels[[i]], collapse = ", ")), "\n")
+  cat(paste("Summed loadings for Parcel", i, ":", summed_loadings[i]), "\n\n")
+}
+
+# Parcel 1: "DISCRIM3"
+blued$D1 <- blued$Discrim3 
+
+psych::describe(blued$D1)
+
+# Parcel 2: "DISCRIM5"  "DISCRIM1"
+blued$D2 <- blued %>% 
+  dplyr::select(Discrim5, Discrim1) %>% 
+  as.data.frame(.) %>% 
+  rowMeans(.)
+
+psych::describe(blued$D2)
+
+# Parcel 3: "DISCRIM2"   "DISCRIM4"
+blued$D3 <- blued %>% 
+  dplyr::select(Discrim2, Discrim4) %>% 
+  as.data.frame(.) %>% 
+  rowMeans(.)
+
+psych::describe(blued$D3)
+```
+
+## Proximal minority stress
+
+```{r}
+Proximal <- blued %>% 
+  dplyr::select(HomoN1:Affirm7)
+
+colnames(Proximal)
+```
+
+```{r}
+Proximal_cfa  <- mplusObject(
+  
+  TITLE = "proximal minority stress CFA;", 
+  
+  VARIABLE = 
+   "usevar = 
+    HomoN1-Affirm7;",          
+  
+  ANALYSIS =  
+   "estimator = MLR;
+    processors = 20;",
+  
+  MODEL = 
+   "homoncon by HomoN1-Conceal3*;
+    homoncon by HomoN1@1;
+    affirm by Affirm1-Affirm7;
+    affirm by Affirm1@1;
+    homoncon with affirm",
+  
+  OUTPUT = 
+    "sampstat standardized;",
+  
+  PLOT = "type=plot2;",
+  
+  usevariables = colnames(Proximal),   
+  rdata = Proximal)                    
+
+Proximal_cfa_fit <- mplusModeler(Proximal_cfa,
+                     dataout= "Proximal_cfa.dat",       
+                    modelout= "Proximal_cfa.inp",
+                    check=TRUE, run = TRUE, hashfilename = FALSE)
+```
+
+```{r}
+# Model fit
+Proximal_cfa_fit_results <-  readModels("Proximal_cfa.out")
+
+Proximal_cfa_model_fit <- Proximal_cfa_fit_results["summaries"] %>% 
+  as.data.frame() %>% 
+  rename_all(~stringr::str_replace(.,"summaries.","")) %>% 
+  dplyr::select(RMSEA_Estimate, CFI, TLI, AIC, BIC, aBIC)
+Proximal_cfa_model_fit
+
+# Standardized parameters
+Proximal_cfa_loading.std <- Proximal_cfa_fit_results[["parameters"]][["stdyx.standardized"]] %>% 
+  as.data.frame() 
+Proximal_cfa_loading.std 
+```
+
+```{r}
+# Parceling
+IH_cfa_loading.std.sorted <- Proximal_cfa_loading.std %>% 
+  filter(paramHeader == 'HOMONCON.BY') %>% 
+  arrange(desc(est)) %>% 
+  dplyr::select(param, est)
+IH_cfa_loading.std.sorted
+
+# Initialize the number of parcels
+num_parcels <- 3
+
+# Create empty lists to hold item names and a vector for loadings sum for each parcel
+parcels <- vector("list", num_parcels)
+parcels_loadings <- numeric(num_parcels)
+
+# Distribute items across parcels to balance the sum of loadings
+for (i in 1:nrow(IH_cfa_loading.std.sorted)) {
+  # Find the parcel with the smallest sum of loadings
+  min_index <- which.min(parcels_loadings)
+  
+  # Add the current item to this parcel
+  parcels[[min_index]] <- c(parcels[[min_index]], IH_cfa_loading.std.sorted$param[i])
+  parcels_loadings[min_index] <- parcels_loadings[min_index] + IH_cfa_loading.std.sorted$est[i]
+}
+
+# Name parcels for clarity
+names(parcels) <- paste0("Parcel", 1:num_parcels)
+
+# Calculate and print the summed loadings for each parcel
+summed_loadings <- parcels_loadings
+names(summed_loadings) <- names(parcels)
+print(summed_loadings)
+
+# Output the results in a more readable format
+for (i in 1:num_parcels) {
+  cat(paste("Parcel", i, "contains items:", paste(parcels[[i]], collapse = ", ")), "\n")
+  cat(paste("Summed loadings for Parcel", i, ":", summed_loadings[i]), "\n\n")
+}
+
+# Parcel 1: "HOMON4"   "HOMON3"   "HOMON9"   "CONCEAL2" "CONCEAL1"
+blued$IH1 <- blued %>% 
+  dplyr::select(HomoN4, HomoN3, HomoN9, Conceal2, Conceal1) %>% 
+  as.data.frame(.) %>% 
+  rowMeans(.)
+
+psych::describe(blued$IH1)
+
+# Parcel 2: "HOMON8"  "HOMON6"  "HOMON10" "HOMON11"
+blued$IH2 <- blued %>% 
+  dplyr::select(HomoN8, HomoN6, HomoN10, HomoN11) %>% 
+  as.data.frame(.) %>% 
+  rowMeans(.)
+
+psych::describe(blued$IH2)
+
+# Parcel 3: "HOMON1"   "HOMON2"   "HOMON7"   "HOMON5"   "CONCEAL3"
+blued$IH3 <- blued %>% 
+  dplyr::select(HomoN1, HomoN2, HomoN7, HomoN5, Conceal3) %>% 
+  as.data.frame(.) %>% 
+  rowMeans(.)
+
+psych::describe(blued$IH3)
+```
+
+```{r}
+affirm_cfa_loading.std.sorted <- Proximal_cfa_loading.std %>% 
+  filter(paramHeader == 'AFFIRM.BY') %>% 
+  arrange(desc(est)) %>% 
+  dplyr::select(param, est)
+affirm_cfa_loading.std.sorted
+
+# Initialize the number of parcels
+num_parcels <- 3
+
+# Create empty lists to hold item names and a vector for loadings sum for each parcel
+parcels <- vector("list", num_parcels)
+parcels_loadings <- numeric(num_parcels)
+
+# Distribute items across parcels to balance the sum of loadings
+for (i in 1:nrow(affirm_cfa_loading.std.sorted)) {
+  # Find the parcel with the smallest sum of loadings
+  min_index <- which.min(parcels_loadings)
+  
+  # Add the current item to this parcel
+  parcels[[min_index]] <- c(parcels[[min_index]], affirm_cfa_loading.std.sorted$param[i])
+  parcels_loadings[min_index] <- parcels_loadings[min_index] + affirm_cfa_loading.std.sorted$est[i]
+}
+
+# Name parcels for clarity
+names(parcels) <- paste0("Parcel", 1:num_parcels)
+
+# Calculate and print the summed loadings for each parcel
+summed_loadings <- parcels_loadings
+names(summed_loadings) <- names(parcels)
+print(summed_loadings)
+
+# Output the results in a more readable format
+for (i in 1:num_parcels) {
+  cat(paste("Parcel", i, "contains items:", paste(parcels[[i]], collapse = ", ")), "\n")
+  cat(paste("Summed loadings for Parcel", i, ":", summed_loadings[i]), "\n\n")
+}
+
+# Parcel 1: "AFFIRM3"   "AFFIRM5"   "AFFIRM7"
+blued$A1 <- blued %>% 
+  dplyr::select(Affirm3, Affirm5, Affirm7) %>% 
+  as.data.frame(.) %>% 
+  rowMeans(.)
+
+psych::describe(blued$A1)
+
+# Parcel 2: "AFFIRM4"  "AFFIRM6"
+blued$A2 <- blued %>% 
+  dplyr::select(Affirm4, Affirm6) %>% 
+  as.data.frame(.) %>% 
+  rowMeans(.)
+
+psych::describe(blued$A2)
+
+# Parcel 3: "AFFIRM2"   "AFFIRM1"
+blued$A3 <- blued %>% 
+  dplyr::select(Affirm2, Affirm1) %>% 
+  as.data.frame(.) %>% 
+  rowMeans(.)
+
+psych::describe(blued$A3)
+```
+
+# Select variables 
+
+```{r}
+blued <- blued %>% 
+  select(!Discrim1:Affirm7)
+
+colnames(blued)
+```
+
+# Mediation model
+
+```{r}
+model <- mplusObject(
+  
+  TITLE = "model;", 
+  
+  VARIABLE = 
+   "usevar = FourDSQ - A3;
+   categorical = Direct Medium Group Appear Body;
+    auxiliary = Code;",          
+  
+  ANALYSIS =  
+   "estimator = ML;
+    bootstrap = 1000;
+    processors = 20;", 
+  
+  MODEL = 
+   "
+   IP by FourDSQ PHQ9 GAD7;
+   IP by FourDSQ@1;
+   
+   D by D1 D2 D3;
+   D by D1@1;
+   
+   IH by IH1 IH2 IH3;
+   IH by IH1@1;
+   
+   A by A1 A2 A3;
+   A by A1@1;
+   
+   IH with A;
+   
+   D with IP;
+   
+   IH on Age GenderId SexPanBi SexOther 
+   out WomPtn EduBelo EduAbov 
+   EmpStu EmpUnemp EmpOth SocLad;
+   
+   A on Age GenderId SexPanBi SexOther 
+   out WomPtn EduBelo EduAbov 
+   EmpStu EmpUnemp EmpOth SocLad;
+   
+   IP on
+   Direct Medium Group Appear Body
+   IH A Age GenderId SexPanBi SexOther 
+   out WomPtn EduBelo EduAbov 
+   EmpStu EmpUnemp EmpOth SocLad;
+   
+   D on
+   Direct Medium Group Appear Body
+   IH A Age GenderId SexPanBi SexOther 
+   out WomPtn EduBelo EduAbov 
+   EmpStu EmpUnemp EmpOth SocLad;
+   
+   Direct on 
+   IH A Age GenderId SexPanBi SexOther 
+   out WomPtn EduBelo EduAbov 
+   EmpStu EmpUnemp EmpOth SocLad;
+   
+   Medium on 
+   IH A Age GenderId SexPanBi SexOther 
+   out WomPtn EduBelo EduAbov 
+   EmpStu EmpUnemp EmpOth SocLad;
+   
+   Group on 
+   IH A Age GenderId SexPanBi SexOther 
+   out WomPtn EduBelo EduAbov 
+   EmpStu EmpUnemp EmpOth SocLad;
+   
+   Appear on 
+   IH A Age GenderId SexPanBi SexOther 
+   out WomPtn EduBelo EduAbov 
+   EmpStu EmpUnemp EmpOth SocLad;
+   
+   Body on 
+   IH A Age GenderId SexPanBi SexOther 
+   out WomPtn EduBelo EduAbov 
+   EmpStu EmpUnemp EmpOth SocLad;
+   
+   Group on 
+   IH A Age GenderId SexPanBi SexOther 
+   out WomPtn EduBelo EduAbov 
+   EmpStu EmpUnemp EmpOth SocLad;
+   
+   !A-paths;
+   Direct on IH (a11);
+   Direct on A (a12);
+   Medium on IH (a21);
+   Medium on A (a22);
+   Group on IH (a31);
+   Group on A (a32);
+   Appear on IH (a41);
+   Appear on A (a42);
+   Body on IH (a51);
+   Body on A (a52);
+   
+   !B-paths;
+   D on Direct (b11);
+   D on Medium (b21);
+   D on Group (b31);
+   D on Appear (b41);
+   D on Body (b51);
+   IP on Direct (b12);
+   IP on Medium (b22);
+   IP on Group (b32);
+   IP on Appear (b42);
+   IP on Body (b52);
+   ",
+  
+  MODELCONSTRAINT =
+    "
+  !Indirect effects;
+  !First digit: Predictor, 1 = IH, 2 = A;
+  !Second digit: Mediator, 1 = Direct, 2 = Medium, 3 = Group,
+  !4 = Appear, 5 = Body;
+  !Third digit: Outcome, 1 = D, 2 = IP;
+  !Mediator = Direct;
+  NEW(ind111 ind112 ind211 ind212);
+  ind111 = a11*b11;
+  ind112 = a11*b12;
+  ind211 = a12*b11;
+  ind212 = a12*b12;
+  
+  !Mediator = Medium;
+  NEW(ind121 ind122 ind221 ind222);
+  ind121 = a21*b21;
+  ind122 = a21*b22;
+  ind221 = a22*b21;
+  ind222 = a22*b22;
+
+  !Mediator = Group;
+  NEW(ind131 ind132 ind231 ind232);
+  ind131 = a31*b31;
+  ind132 = a31*b32;
+  ind231 = a32*b31;
+  ind232 = a32*b32;
+  
+  !Mediator = Appear;
+  NEW(ind141 ind142 ind241 ind242);
+  ind141 = a41*b41;
+  ind142 = a41*b42;
+  ind241 = a42*b41;
+  ind242 = a42*b42;
+  
+  !Mediator = Body;
+  NEW(ind151 ind152 ind251 ind252);
+  ind151 = a51*b51;
+  ind152 = a51*b52;
+  ind251 = a52*b51;
+  ind252 = a52*b52;
+   ",
+  
+  OUTPUT = 
+    "sampstat cinterval (bcbootstrap); ! bias-corrected bootstrap", 
+  
+  PLOT = "type=plot2;",
+  
+  usevariables = colnames(blued),   
+  rdata = blued)                    
+
+model_fit <- mplusModeler(model,
+                     dataout= "model.dat",       
+                     modelout= "model.inp",
+                     check=TRUE, run = TRUE, hashfilename = FALSE)
+```
+
+# Read model
+
+```{r}
+model_results <- readModels("model.out")
+```
+
+# Regression coefficients
+
+A-paths: Internalized homophobia negatively predicted direct verbal disclosure, disclosure through a medium, and disclosure in a group setting. LGBTQ+ affirmation positively predicted direct verbal disclosure, disclosure through a medium, and disclosure in a group setting. 
+
+B-paths: Direct verbal disclosure and disclosure through a medium positively predicted internalizing problems. Disclosure in a group setting positively predicted discrimination. 
+
+C'-paths: Internalized homophobia and LGBTQ+ affirmation positively predicted internalizing problems. Internalized homophobia positively predicted discrimination.
+```{r}
+coefficients <- model_results[["parameters"]][["unstandardized"]] %>% 
+  filter(str_detect(paramHeader, "\\.ON$")) %>% 
+  as.data.frame()
+
+coefficients
+```
+
+# Indirect effects
+Internalized homophobia negatively predicted discrimination via disclosure in a group setting. LGBTQ+ affirmation positively predicted discrimination via disclosure in a group setting.
+
+Internalized homophobia negatively predicted internalizing problems via direct verbal disclosure, disclosure through a medium, and disclosure in a group setting. LGBTQ+ affirmation positively predicted nternalizing problems via direct verbal disclosure, disclosure through a medium, and disclosure in a group setting. 
+
+```{r}
+ind <- model_results[["parameters"]][["ci.unstandardized"]] %>% 
+  as.data.frame() %>% 
+  dplyr::select(paramHeader, param, low2.5, est, up2.5) %>% 
+  filter(paramHeader == "New.Additional.Parameters")
+
+ind
+```
+
+

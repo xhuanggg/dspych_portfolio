@@ -1,5 +1,73 @@
 ---
-title: "Portfolio 5"
+title: "Replicating a two-way ANOVA in a regression"
+author: "Thomas Huang"
+date: "2026-04-02"
+output: github_document
 ---
 
-> The projects should be numbered consecutively (i.e., in the order in which you began them), and should include for each project a description of the goal, the product (computer program, hand graph, computer graph, etc.), the data, and some interpretation. Reports must be reproducible and of high quality in terms of writing, grammar, presentation, etc.
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("/Users/roberthuang/Desktop/Wake/Spring 2026/DSPsych/dspych_portfolio/p05")
+```
+
+The cool thing with this project is that it replicates the exact results of a two-way ANOVA.
+
+## Packages and data
+
+```{r}
+library(tidyverse);library(MplusAutomation);library(here)
+load("df.RData")
+
+colnames(df)
+```
+
+First, I will show how a continuous variable is regressed on two factors. Usually, this is done with dummy coding.
+
+## Rename variables
+
+```{r}
+df$t <- ifelse(df$Condition == "OPR" | df$Condition == "OPB", 0, 1) # 0 = self, 1 = other
+df$v <- ifelse(df$Condition == "SPB" | df$Condition == "OPB", 0, 1) # 0 = private, 1 = public
+df$vt <- df$v*df$t
+df$rt <- df$rtidx
+
+df %>% 
+  select(v, t) %>% 
+  psych::describe()
+```
+
+## Regression with dummy coding
+
+In this case, the coefficients of the IVs are simple slopes, or simple effects in an ANOVA. Therefore, what is problematic here is that I cannot estimate the main effects like an ANOVA. A potential consequence is that, if I would like to run a mediation model extending from this regression, I cannot estimate the indirect effects of the main effects of the IVs.
+```{r}
+reg_dummy <- lm(rtidx ~ v + t + vt, data = df)
+summary(reg_dummy)
+```
+
+## Replicating the ANOVA with a smarter coding scheme
+
+A way to solve this problem is to ditch dummy coding and to code the IVs as -0.5 and 0.5
+
+```{r}
+df$t <- ifelse(df$Condition == "OPR" | df$Condition == "OPB", -0.5, 0.5) # 0 = self, 1 = other
+df$v <- ifelse(df$Condition == "SPB" | df$Condition == "OPB", -0.5, 0.5) # 0 = private, 1 = public
+df$vt <- df$v*df$t
+df$rt <- df$rtidx
+```
+
+```{r}
+reg_anova <- lm(rtidx ~ v + t + vt, data = df)
+summary(reg_anova)
+```
+
+## Let's check if this has replicated the ANOVA results
+
+```{r}
+D_rt <- psych::describeBy(df$rtidx, df$Condition)
+D_rt
+
+anova_rt <- aov(rtidx ~ target * visibility, data = df)
+summary(anova_rt)
+```
+
+The regression replicated the ANOVA results. Built upon this, we can do two things. First, we can run mediation if we are interested in the indirect effects of the ANOVA main effects. Second, this simply makes ANCOVAs more intuitive. No need to learn how to run an ANCOVA. Just add controls into the above regression.

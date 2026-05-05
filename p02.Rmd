@@ -1,5 +1,86 @@
 ---
 title: "Portfolio 2"
+author: "Thomas Huang"
+date: "2026-02-06"
+output: github_document
 ---
 
-> The projects should be numbered consecutively (i.e., in the order in which you began them), and should include for each project a description of the goal, the product (computer program, hand graph, computer graph, etc.), the data, and some interpretation. Reports must be reproducible and of high quality in terms of writing, grammar, presentation, etc.
+This portfolio piece aims to visualize a scree plot or an elbow plot for LCA model selection with Mplus out files. 
+
+# Load packages
+
+```{r load-package-data}
+library(tidyverse);library(MplusAutomation);library(cowplot)
+```
+
+# Read Mplus out files
+
+```{r read-out-files}
+for (i in 1:8){
+  assign(paste0("lca_", i, "c"), readModels(paste0("LCA_", i, ".out")))
+}
+```
+
+# Extract model fit indices
+
+```{r model-fit}
+df_summaries <- bind_rows(
+          lca_1c$summaries, 
+          lca_2c$summaries,
+          lca_3c$summaries,
+          lca_4c$summaries,
+          lca_5c$summaries,
+          lca_6c$summaries,
+          lca_7c$summaries,
+          lca_8c$summaries
+          )
+
+colnames(df_summaries)
+
+# Select the columns for model fit
+df_summaries <- df_summaries %>% 
+  dplyr::select(NLatentClasses, Parameters, LL, AIC:aBIC, Entropy, T11_VLMR_PValue, BLRT_PValue)
+
+df_summaries
+```
+
+# Convert model fit to long format
+
+```{r fit-wide-to-long}
+df_summaries_long <- df_summaries %>% 
+  mutate(`-2LL` = -2*LL) %>% 
+  pivot_longer(cols = c(AIC, BIC, aBIC, `-2LL`),
+               names_to = "Index",
+               values_to = "Value"
+  ) %>% 
+  dplyr::select(NLatentClasses, Index, Value)
+
+glimpse(df_summaries_long)
+```
+
+# Plot
+
+```{r plot}
+plot <- ggplot(df_summaries_long, 
+               aes(x = NLatentClasses, 
+                   y = Value,
+                  shape = Index,
+                  colour = Index,
+                  linetype = Index
+                )) + 
+                geom_point(size = 4) +
+                geom_line() +
+                theme_cowplot() +
+                labs(x = "Number of classes", y = "Value") + 
+                theme(
+                  text = element_text(size = 12), 
+                  legend.key.width = unit(.5, "line"), 
+                  legend.text = element_text(size = 12), 
+                  legend.title = element_blank(), 
+                  legend.position = "right"
+                 )
+
+plot
+```
+
+

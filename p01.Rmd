@@ -1,5 +1,7 @@
 ---
 title: "Portfolio 1"
+author: "Thomaas Huang"
+output: github_document
 ---
 
 This portfolio aims to practice my skills of data wrangling. Specifically, I will import Mplus .out files and present them in a more straightforward fashion. I choose to do this because (a) it is very confusing to find the right information in Mplus and (b) I need present some modeling for my SPSP poster. 
@@ -13,32 +15,144 @@ library(MplusAutomation)
 # Import Mplus .out file
 
 ```{r import-file}
+model_results <- readModels("model2_r.out")
+names(model_results)
+```
 
+# Model fit information
+
+```{r model-fit}
+model_fit <- model_results["summaries"] %>% 
+  as.data.frame() %>% 
+  rename_all(~stringr::str_replace(.,"summaries.","")) %>% 
+  dplyr::select(RMSEA_Estimate, SRMR, ChiSqM_Value, ChiSqM_DF, ChiSqM_PValue, CFI, TLI, AIC, BIC, aBIC)
+
+model_fit
+```
+# Undstandardized coefficients
+## Factor loadings
+
+```{r unstd-loadings}
+unstd_loadings <- model_results[["parameters"]][["unstandardized"]] %>% 
+  as.data.frame() %>% 
+  filter(str_detect(paramHeader, "\\.BY$"))
+
+unstd_loadings
+```
+
+## Regression coefficients
+
+```{r unstd-reg}
+unstd_reg <- model_results[["parameters"]][["unstandardized"]] %>% 
+  as.data.frame() %>% 
+  filter(str_detect(paramHeader, "\\.ON$"))
+
+unstd_reg
+```
+
+## Correlation among predictors and mediators
+
+```{r unstd-corr}
+unstd_corr <- model_results[["parameters"]][["unstandardized"]] %>% 
+  as.data.frame() %>% 
+  filter(str_detect(paramHeader, "\\.WITH$"))
+
+unstd_corr
+```
+
+## Intercepts
+
+```{r unstd-intcpt}
+unstd_intcpt <- model_results[["parameters"]][["unstandardized"]] %>% 
+  as.data.frame() %>% 
+  filter(str_detect(paramHeader, "\\Intercepts$"))
+
+unstd_intcpt
+```
+
+## Residual variances
+
+```{r unstd-residual}
+unstd_residual <- model_results[["parameters"]][["unstandardized"]] %>% 
+  as.data.frame() %>% 
+  filter(str_detect(paramHeader, "Residual.Variances$"))
+
+unstd_residual
+```
+
+## Indirect effects
+
+This chunk of codes extracts 95% CI of indirect effects estimated by bootstrapped samples
+```{r unstd-ind}
+unstd_ind <- model_results[["indirect"]][["ci.unstandardized"]][["specific"]] %>% 
+  as.data.frame() %>% 
+  dplyr::select(pred, intervening, outcome, low2.5, est, up2.5)
+
+unstd_ind
+```
+
+# Standardized coefficients
+## Factor loadings
+
+```{r std-loadings}
+std_loadings <- model_results[["parameters"]][["stdyx.standardized"]] %>% 
+  as.data.frame() %>% 
+  filter(str_detect(paramHeader, "\\.BY$"))
+
+std_loadings
+```
+
+## Regression coefficients
+
+```{r std-reg}
+std_reg <- model_results[["parameters"]][["stdyx.standardized"]] %>% 
+  as.data.frame() %>% 
+  filter(str_detect(paramHeader, "\\.ON$"))
+
+std_reg
+```
+
+## Correlation among predictors and mediators
+
+```{r std-corr}
+std_corr <- model_results[["parameters"]][["stdyx.standardized"]] %>% 
+  as.data.frame() %>% 
+  filter(str_detect(paramHeader, "\\.WITH$"))
+
+std_corr
+```
+
+## Intercepts
+
+Note: There are only standardized intercepts for measurement models. There is no standardized intercept for regression coefficient.
+```{r std-intcpt}
+std_intcpt <- model_results[["parameters"]][["stdyx.standardized"]] %>% 
+  as.data.frame() %>% 
+  filter(str_detect(paramHeader, "\\Intercepts$"))
+
+std_intcpt
+```
+
+## Residual variances
+
+```{r std-residual}
+std_residual <- model_results[["parameters"]][["stdyx.standardized"]] %>% 
+  as.data.frame() %>% 
+  filter(str_detect(paramHeader, "Residual.Variances$"))
+
+std_residual
+```
+
+## Indirect effects
+
+```{r std-ind}
+std_ind <- model_results[["indirect"]][["ci.stdyx.standardized"]][["specific"]] %>% 
+  as.data.frame() %>% 
+  dplyr::select(pred, intervening, outcome, low2.5, est, up2.5)
+
+std_ind
 ```
 
 
-Sed mollis purus faucibus leo finibus, ut pharetra nibh elementum. Nulla id orci lorem. Mauris sollicitudin mi eget tellus vehicula, ut convallis lorem mollis. In blandit nulla diam, a malesuada sem volutpat interdum. Ut elementum elit at velit maximus, ac tempor odio porttitor. Suspendisse lobortis sollicitudin tortor, ut pharetra libero luctus a. Sed hendrerit faucibus metus. Sed rutrum purus vel pellentesque euismod.
 
 
-```{r}
-# Create a barplot of the number of fish encounters by species
-ggplot(data = fish_encounters, aes(x = station, y = seen)) +
-  geom_bar(stat = "identity") +
-  labs(x = "Species", y = "Number of Fish Encounters") +
-  theme_minimal()
-  
-```
-
-Mauris placerat in velit a pharetra. Nulla viverra bibendum lectus, ut lobortis nibh. Aenean malesuada, orci vitae dictum placerat, enim justo aliquet leo, ac tincidunt augue ipsum et mi. Nullam in pharetra metus, nec molestie felis. Duis varius rhoncus pulvinar. Integer semper urna sed tellus rhoncus, vel suscipit odio iaculis. Mauris iaculis neque pellentesque ex convallis venenatis. Sed ultrices euismod fermentum. Ut feugiat risus at turpis tincidunt viverra.
-
-
-```{r}
-# Create a barplot of the number of fish encounters by species
-ggplot(data = fish_encounters, aes(x = station, y = seen)) +
-  geom_bar(stat = "identity") +
-  labs(x = "Species", y = "Number of Fish Encounters") +
-  theme_classic()
-  
-```
-
-Donec sagittis suscipit orci in ultrices. Vivamus iaculis eleifend est et dictum. Fusce non urna at lacus dapibus tincidunt ac sed nibh. Donec luctus lectus elit, ac ultrices tortor mollis sit amet. Nulla finibus lacinia arcu. Proin sollicitudin non odio et pulvinar. Maecenas finibus faucibus finibus. Ut elementum metus velit, a sodales sapien commodo et. Vivamus pulvinar, sapien et porta cursus, elit est luctus nisi, eget fringilla odio diam et enim. Sed sodales suscipit bibendum. Morbi ut metus semper, laoreet felis sodales, consequat dolor.

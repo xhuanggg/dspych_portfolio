@@ -1,5 +1,313 @@
 ---
 title: "Portfolio 4"
+author: "Thomas Huang"
+date: "2026-03-31"
+output: github_document
 ---
 
-> The projects should be numbered consecutively (i.e., in the order in which you began them), and should include for each project a description of the goal, the product (computer program, hand graph, computer graph, etc.), the data, and some interpretation. Reports must be reproducible and of high quality in terms of writing, grammar, presentation, etc.
+This portfolio piece is part of my data analysis for my thesis. This piece deals with two things: data cleaning and running two two-way ANOVAs.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("/Users/roberthuang/Desktop/Wake/Spring 2026/DSPsych/dspych_portfolio/p04")
+```
+
+## Packages and data
+
+```{r}
+library(tidyverse);library(readxl);library(psych);library(emmeans);library(effectsize)
+
+df <- read_excel("data.xlsx")
+fail_check <- read_excel("Fail_Check.xlsx")
+```
+
+## Cleaning
+
+```{r}
+glimpse(df)
+```
+
+## Merge scenarios
+
+```{r}
+# Recode 2 into 0 in scenario items
+df <- df %>%
+  mutate(across(paste0("SPR", 1:5),
+                ~ ifelse(. == 2, 0, .))) %>% 
+  mutate(across(paste0("SPB", 1:5),
+                ~ ifelse(. == 2, 0, .))) %>% 
+  mutate(across(paste0("OPR", 1:5),
+                ~ ifelse(. == 2, 0, .))) %>% 
+  mutate(across(paste0("OPB", 1:5),
+                ~ ifelse(. == 2, 0, .)))
+
+df <- df %>%
+  mutate(
+    S1 = rowSums(select(., SPR1, SPB1, OPR1, OPB1), na.rm = TRUE),
+    S2 = rowSums(select(., SPR2, SPB2, OPR2, OPB2), na.rm = TRUE),
+    S3 = rowSums(select(., SPR3, SPB3, OPR3, OPB3), na.rm = TRUE),
+    S4 = rowSums(select(., SPR4, SPB4, OPR4, OPB4), na.rm = TRUE),
+    S5 = rowSums(select(., SPR5, SPB5, OPR5, OPB5), na.rm = TRUE)
+  )
+
+df %>% 
+  select(S1:S5) %>% 
+  psych::describe()
+```
+
+## Calculate risk-taking index
+
+```{r}
+df$rtidx <- df %>% 
+  select(S1:S5) %>% 
+  rowMeans(na.rm = TRUE)
+```
+
+## Merge other variables
+
+```{r}
+# all variable names
+vars <- names(df)
+
+# keep only condition-prefixed variables
+conds <- c("SPR", "SPB", "OPR", "OPB")
+
+pattern <- paste0("^(", paste(conds, collapse="|"), ")_")
+
+# extract suffix (item names)
+items <- unique(sub(pattern, "", vars[grepl(pattern, vars)]))
+
+library(dplyr)
+
+process_all <- function(df, conds) {
+  
+  pattern <- paste0("^(", paste(conds, collapse="|"), ")_")
+  vars <- names(df)
+  
+  items <- unique(sub(pattern, "", vars[grepl(pattern, vars)]))
+  
+  for (item in items) {
+    
+    cols <- paste0(conds, "_", item)
+    cols <- cols[cols %in% names(df)]  # only keep existing ones
+    
+    # skip if less than 2 columns (safety)
+    if (length(cols) == 0) next
+    
+    # v0
+    df[[paste0(item, "_v0")]] <- coalesce(!!!df[cols])
+    
+    # C
+    df[[paste0(item, "_C")]] <- conds[
+      max.col(!is.na(df[cols]), ties.method = "first")
+    ]
+  }
+  
+  return(df)
+}
+
+df <- process_all(df, c("SPR", "SPB", "OPR", "OPB"))
+df <- df %>% 
+  mutate(Condition = MC1_C) %>% 
+  select(-ends_with("_C")) %>% 
+  rename(
+    MC1 = MC1_v0,
+    MC2 = MC2_v0,
+    AC1 = AC1_v0,
+    IM  = IM_v0,
+    AC2 = AC2_v0
+  )
+```
+
+## Define conditions
+
+```{r}
+df$target <- ifelse(df$Condition == "OPR" | df$Condition == "OPB", 1, 0) # 0 = self, 1 = other
+df$visibility <- ifelse(df$Condition == "SPB" | df$Condition == "OPB", 1, 0) # 0 = private, 1 = public
+``` 
+
+## Attention checks
+
+```{r}
+failed <- fail_check %>% 
+  dplyr::pull(PID) %>% 
+  as.list()
+
+df <- df %>% 
+  filter(AC2 == 3) %>% 
+  filter(PROLIFIC_PID %in% failed == FALSE) # N = 995
+```
+
+## Inclusion criteria
+
+```{r}
+df <- df %>% 
+  filter(Age >= 18 & Age <= 35) %>% 
+  filter(Gender == 2) %>% 
+  filter(SexualOrientation == 1 | SexualOrientation == 2) # N = 953
+```
+
+## Manipulation checks
+
+```{r}
+# Self-private
+table(df$SPR_MC1)
+table(df$SPR_MC2)
+
+# Self-public
+table(df$SPB_MC1)
+table(df$SPB_MC2)
+
+# Other-private
+table(df$OPR_MC1)
+table(df$OPR_MC2)
+
+# Other-public
+table(df$OPB_MC1)
+table(df$OPB_MC2)
+
+fail_MC <- df %>% 
+  filter(
+    MC1 == 2 & visibility == 0 | 
+      MC2 == 2 & visibility == 0 |
+      MC1 == 1 & visibility == 1 |
+      MC2 == 1 & visibility == 1)
+
+table(fail_MC$Condition)
+
+df2 <- df
+save(df2, file = "df2.RData")
+
+df <- df %>% 
+  filter(MC1 == 1 & visibility == 0 | MC1 == 2 & visibility == 1) %>% 
+  filter(MC2 == 1 & visibility == 0 | MC2 == 2 & visibility == 1) #N = 922. 31 participants did not pass MC.
+```
+
+## Risk-taking across conditions
+
+```{r}
+df$Condition <- factor(df$Condition)
+df$target <- factor(df$target)
+df$visibility <- factor(df$visibility)
+
+D_rt <- psych::describeBy(df$rtidx, df$Condition)
+D_rt
+
+psych::describeBy(df$rtidx, df$target)
+psych::describeBy(df$rtidx, df$visibility)
+
+model_rt <- aov(rtidx ~ target * visibility, data = df)
+summary(model_rt)
+
+# Simple effects within decision target
+joint_tests(model_rt, by = "target")
+
+# Simple effects within visibility
+joint_tests(model_rt, by = "visibility")
+
+# Effect sizes
+eta_squared(model_rt, partial = TRUE)
+
+# Effect size of other-private vs other-public
+L <- D_rt[["OPB"]][["mean"]] - D_rt[["OPR"]][["mean"]]
+SS_effect <- L^2/(1/D_rt[["OPB"]][["n"]] + 1/D_rt[["OPR"]][["n"]])
+aov_tab <- anova(model_rt)
+SS_error  <- aov_tab["Residuals", "Sum Sq"]
+rt_eta2_p <- SS_effect/(SS_effect+SS_error)
+rt_eta2_p
+
+# Effect size of self-private vs self-public
+L <- D_rt[["SPB"]][["mean"]] - D_rt[["SPR"]][["mean"]]
+SS_effect <- L^2/(1/D_rt[["SPB"]][["n"]] + 1/D_rt[["SPR"]][["n"]])
+aov_tab <- anova(model_rt)
+SS_error  <- aov_tab["Residuals", "Sum Sq"]
+rt_eta2_p <- SS_effect/(SS_effect+SS_error)
+rt_eta2_p
+
+# Effect size of self-private vs other-private
+L <- D_rt[["OPR"]][["mean"]] - D_rt[["SPR"]][["mean"]]
+SS_effect <- L^2/(1/D_rt[["OPR"]][["n"]] + 1/D_rt[["SPR"]][["n"]])
+aov_tab <- anova(model_rt)
+SS_error  <- aov_tab["Residuals", "Sum Sq"]
+rt_eta2_p <- SS_effect/(SS_effect+SS_error)
+rt_eta2_p
+
+# Effect size of self-public vs other-public
+L <- D_rt[["OPB"]][["mean"]] - D_rt[["SPB"]][["mean"]]
+SS_effect <- L^2/(1/D_rt[["OPB"]][["n"]] + 1/D_rt[["SPB"]][["n"]])
+aov_tab <- anova(model_rt)
+SS_error  <- aov_tab["Residuals", "Sum Sq"]
+rt_eta2_p <- SS_effect/(SS_effect+SS_error)
+rt_eta2_p
+```
+
+## Perceived impression management concerns across conditions
+
+```{r}
+# Compare impression management
+D_im <- psych::describeBy(df$IM, df$Condition)
+D_im
+
+psych::describeBy(df$IM, df$target)
+psych::describeBy(df$IM, df$visibility)
+
+model_im <- aov(IM ~ target * visibility, data = df)
+summary(model_im)
+
+# Simple effects within decision target
+joint_tests(model_im, by = "target")
+
+# Simple effects within visibility
+joint_tests(model_im, by = "visibility")
+
+# Effect sizes
+eta_squared(model_im, partial = TRUE)
+
+# Effect size of other-private vs other-public
+L <- D_im[["OPB"]][["mean"]] - D_im[["OPR"]][["mean"]]
+SS_effect <- L^2/(1/D_im[["OPB"]][["n"]] + 1/D_im[["OPR"]][["n"]])
+aov_tab <- anova(model_im)
+SS_error  <- aov_tab["Residuals", "Sum Sq"]
+im_eta2_p <- SS_effect/(SS_effect+SS_error)
+im_eta2_p
+
+# Effect size of self-private vs self-public
+L <- D_im[["SPB"]][["mean"]] - D_im[["SPR"]][["mean"]]
+SS_effect <- L^2/(1/D_im[["SPB"]][["n"]] + 1/D_im[["SPR"]][["n"]])
+aov_tab <- anova(model_im)
+SS_error  <- aov_tab["Residuals", "Sum Sq"]
+im_eta2_p <- SS_effect/(SS_effect+SS_error)
+im_eta2_p
+
+# Effect size of self-private vs other-private
+L <- D_im[["OPR"]][["mean"]] - D_im[["SPR"]][["mean"]]
+SS_effect <- L^2/(1/D_im[["OPR"]][["n"]] + 1/D_im[["SPR"]][["n"]])
+aov_tab <- anova(model_im)
+SS_error  <- aov_tab["Residuals", "Sum Sq"]
+im_eta2_p <- SS_effect/(SS_effect+SS_error)
+im_eta2_p
+
+# Effect size of self-public vs other-public
+L <- D_im[["OPB"]][["mean"]] - D_im[["SPB"]][["mean"]]
+SS_effect <- L^2/(1/D_im[["OPB"]][["n"]] + 1/D_im[["SPB"]][["n"]])
+aov_tab <- anova(model_im)
+SS_error  <- aov_tab["Residuals", "Sum Sq"]
+im_eta2_p <- SS_effect/(SS_effect+SS_error)
+im_eta2_p
+```
+
+## Compare risk-taking by scenario
+
+```{r}
+psych::describeBy(df$S1, df$Condition) #Dance
+psych::describeBy(df$S2, df$Condition) #Talk to a guy
+psych::describeBy(df$S3, df$Condition) #Date a guy at gym
+psych::describeBy(df$S4, df$Condition) #Valentine's Day gift
+psych::describeBy(df$S5, df$Condition) #Confess to a close friend
+```
+
+## Save data for mediation analysis
+
+```{r}
+save(df, file = "df.RData")
+```
