@@ -1,0 +1,874 @@
+Mplus VERSION 8.3 (Mac)
+MUTHEN & MUTHEN
+05/05/2026   5:45 PM
+
+INPUT INSTRUCTIONS
+
+  TITLE:
+  proximal minority stress CFA;
+  DATA:
+  FILE = "Proximal_cfa.dat";
+  VARIABLE:
+  NAMES = HomoN1 HomoN2 HomoN3 HomoN4 HomoN5 HomoN6 HomoN7 HomoN8 HomoN9 HomoN10
+       HomoN11 Conceal1 Conceal2 Conceal3 Affirm1 Affirm2 Affirm3 Affirm4 Affirm5
+       Affirm6 Affirm7;
+   MISSING=.;
+   usevar =
+      HomoN1-Affirm7;
+  ANALYSIS:
+  estimator = MLR;
+      processors = 20;
+  MODEL:
+  homoncon by HomoN1-Conceal3*;
+      homoncon by HomoN1@1;
+      affirm by Affirm1-Affirm7;
+      affirm by Affirm1@1;
+      homoncon with affirm
+  OUTPUT:
+  sampstat standardized;
+  PLOT:
+  type=plot2;
+
+
+
+INPUT READING TERMINATED NORMALLY
+
+
+
+
+proximal minority stress CFA;
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                        2266
+
+Number of dependent variables                                   21
+Number of independent variables                                  0
+Number of continuous latent variables                            2
+
+Observed dependent variables
+
+  Continuous
+   HOMON1      HOMON2      HOMON3      HOMON4      HOMON5      HOMON6
+   HOMON7      HOMON8      HOMON9      HOMON10     HOMON11     CONCEAL1
+   CONCEAL2    CONCEAL3    AFFIRM1     AFFIRM2     AFFIRM3     AFFIRM4
+   AFFIRM5     AFFIRM6     AFFIRM7
+
+Continuous latent variables
+   HOMONCON    AFFIRM
+
+
+Estimator                                                      MLR
+Information matrix                                        OBSERVED
+Maximum number of iterations                                  1000
+Convergence criterion                                    0.500D-04
+Maximum number of steepest descent iterations                   20
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+
+Input data file(s)
+  Proximal_cfa.dat
+
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns             1
+
+
+COVARIANCE COVERAGE OF DATA
+
+Minimum covariance coverage value   0.100
+
+
+     PROPORTION OF DATA PRESENT
+
+
+           Covariance Coverage
+              HOMON1        HOMON2        HOMON3        HOMON4        HOMON5
+              ________      ________      ________      ________      ________
+ HOMON1         1.000
+ HOMON2         1.000         1.000
+ HOMON3         1.000         1.000         1.000
+ HOMON4         1.000         1.000         1.000         1.000
+ HOMON5         1.000         1.000         1.000         1.000         1.000
+ HOMON6         1.000         1.000         1.000         1.000         1.000
+ HOMON7         1.000         1.000         1.000         1.000         1.000
+ HOMON8         1.000         1.000         1.000         1.000         1.000
+ HOMON9         1.000         1.000         1.000         1.000         1.000
+ HOMON10        1.000         1.000         1.000         1.000         1.000
+ HOMON11        1.000         1.000         1.000         1.000         1.000
+ CONCEAL1       1.000         1.000         1.000         1.000         1.000
+ CONCEAL2       1.000         1.000         1.000         1.000         1.000
+ CONCEAL3       1.000         1.000         1.000         1.000         1.000
+ AFFIRM1        1.000         1.000         1.000         1.000         1.000
+ AFFIRM2        1.000         1.000         1.000         1.000         1.000
+ AFFIRM3        1.000         1.000         1.000         1.000         1.000
+ AFFIRM4        1.000         1.000         1.000         1.000         1.000
+ AFFIRM5        1.000         1.000         1.000         1.000         1.000
+ AFFIRM6        1.000         1.000         1.000         1.000         1.000
+ AFFIRM7        1.000         1.000         1.000         1.000         1.000
+
+
+           Covariance Coverage
+              HOMON6        HOMON7        HOMON8        HOMON9        HOMON10
+              ________      ________      ________      ________      ________
+ HOMON6         1.000
+ HOMON7         1.000         1.000
+ HOMON8         1.000         1.000         1.000
+ HOMON9         1.000         1.000         1.000         1.000
+ HOMON10        1.000         1.000         1.000         1.000         1.000
+ HOMON11        1.000         1.000         1.000         1.000         1.000
+ CONCEAL1       1.000         1.000         1.000         1.000         1.000
+ CONCEAL2       1.000         1.000         1.000         1.000         1.000
+ CONCEAL3       1.000         1.000         1.000         1.000         1.000
+ AFFIRM1        1.000         1.000         1.000         1.000         1.000
+ AFFIRM2        1.000         1.000         1.000         1.000         1.000
+ AFFIRM3        1.000         1.000         1.000         1.000         1.000
+ AFFIRM4        1.000         1.000         1.000         1.000         1.000
+ AFFIRM5        1.000         1.000         1.000         1.000         1.000
+ AFFIRM6        1.000         1.000         1.000         1.000         1.000
+ AFFIRM7        1.000         1.000         1.000         1.000         1.000
+
+
+           Covariance Coverage
+              HOMON11       CONCEAL1      CONCEAL2      CONCEAL3      AFFIRM1
+              ________      ________      ________      ________      ________
+ HOMON11        1.000
+ CONCEAL1       1.000         1.000
+ CONCEAL2       1.000         1.000         1.000
+ CONCEAL3       1.000         1.000         1.000         1.000
+ AFFIRM1        1.000         1.000         1.000         1.000         1.000
+ AFFIRM2        1.000         1.000         1.000         1.000         1.000
+ AFFIRM3        1.000         1.000         1.000         1.000         1.000
+ AFFIRM4        1.000         1.000         1.000         1.000         1.000
+ AFFIRM5        1.000         1.000         1.000         1.000         1.000
+ AFFIRM6        1.000         1.000         1.000         1.000         1.000
+ AFFIRM7        1.000         1.000         1.000         1.000         1.000
+
+
+           Covariance Coverage
+              AFFIRM2       AFFIRM3       AFFIRM4       AFFIRM5       AFFIRM6
+              ________      ________      ________      ________      ________
+ AFFIRM2        1.000
+ AFFIRM3        1.000         1.000
+ AFFIRM4        1.000         1.000         1.000
+ AFFIRM5        1.000         1.000         1.000         1.000
+ AFFIRM6        1.000         1.000         1.000         1.000         1.000
+ AFFIRM7        1.000         1.000         1.000         1.000         1.000
+
+
+           Covariance Coverage
+              AFFIRM7
+              ________
+ AFFIRM7        1.000
+
+
+SAMPLE STATISTICS
+
+
+     ESTIMATED SAMPLE STATISTICS
+
+
+           Means
+              HOMON1        HOMON2        HOMON3        HOMON4        HOMON5
+              ________      ________      ________      ________      ________
+                1.816         1.788         1.688         1.829         2.643
+
+
+           Means
+              HOMON6        HOMON7        HOMON8        HOMON9        HOMON10
+              ________      ________      ________      ________      ________
+                2.127         2.579         1.842         1.832         1.955
+
+
+           Means
+              HOMON11       CONCEAL1      CONCEAL2      CONCEAL3      AFFIRM1
+              ________      ________      ________      ________      ________
+                2.487         2.420         2.262         3.248         2.847
+
+
+           Means
+              AFFIRM2       AFFIRM3       AFFIRM4       AFFIRM5       AFFIRM6
+              ________      ________      ________      ________      ________
+                2.703         2.766         3.012         3.450         3.555
+
+
+           Means
+              AFFIRM7
+              ________
+                3.316
+
+
+           Covariances
+              HOMON1        HOMON2        HOMON3        HOMON4        HOMON5
+              ________      ________      ________      ________      ________
+ HOMON1         0.907
+ HOMON2         0.697         0.872
+ HOMON3         0.595         0.586         0.924
+ HOMON4         0.715         0.708         0.692         1.010
+ HOMON5         0.544         0.494         0.500         0.619         1.633
+ HOMON6         0.658         0.632         0.700         0.765         0.859
+ HOMON7         0.533         0.519         0.508         0.612         1.131
+ HOMON8         0.618         0.618         0.604         0.675         0.599
+ HOMON9         0.578         0.566         0.543         0.601         0.520
+ HOMON10        0.561         0.556         0.550         0.607         0.556
+ HOMON11        0.452         0.420         0.409         0.500         0.644
+ CONCEAL1       0.271         0.245         0.220         0.233         0.336
+ CONCEAL2       0.316         0.308         0.288         0.307         0.340
+ CONCEAL3       0.254         0.224         0.201         0.295         0.810
+ AFFIRM1       -0.035        -0.038        -0.090        -0.081         0.012
+ AFFIRM2       -0.011        -0.011        -0.033        -0.065         0.000
+ AFFIRM3       -0.073        -0.065        -0.109        -0.127        -0.099
+ AFFIRM4       -0.098        -0.096        -0.124        -0.143        -0.013
+ AFFIRM5       -0.062        -0.051        -0.068        -0.043         0.236
+ AFFIRM6       -0.172        -0.170        -0.234        -0.192         0.033
+ AFFIRM7       -0.036        -0.029        -0.043        -0.016         0.187
+
+
+           Covariances
+              HOMON6        HOMON7        HOMON8        HOMON9        HOMON10
+              ________      ________      ________      ________      ________
+ HOMON6         1.314
+ HOMON7         0.857         1.521
+ HOMON8         0.747         0.634         0.932
+ HOMON9         0.650         0.563         0.674         0.944
+ HOMON10        0.688         0.598         0.648         0.653         1.039
+ HOMON11        0.596         0.649         0.515         0.494         0.584
+ CONCEAL1       0.279         0.255         0.308         0.301         0.297
+ CONCEAL2       0.319         0.303         0.375         0.373         0.355
+ CONCEAL3       0.462         0.657         0.267         0.258         0.294
+ AFFIRM1       -0.160         0.043        -0.044        -0.018         0.001
+ AFFIRM2       -0.146         0.015        -0.010         0.008         0.005
+ AFFIRM3       -0.215        -0.059        -0.088        -0.044        -0.054
+ AFFIRM4       -0.168         0.015        -0.107        -0.068        -0.056
+ AFFIRM5        0.069         0.250        -0.054        -0.043        -0.014
+ AFFIRM6       -0.196         0.016        -0.203        -0.169        -0.156
+ AFFIRM7        0.047         0.223        -0.045        -0.022         0.022
+
+
+           Covariances
+              HOMON11       CONCEAL1      CONCEAL2      CONCEAL3      AFFIRM1
+              ________      ________      ________      ________      ________
+ HOMON11        1.478
+ CONCEAL1       0.318         1.222
+ CONCEAL2       0.314         0.673         1.091
+ CONCEAL3       0.414         0.431         0.440         1.569
+ AFFIRM1        0.240         0.245         0.106         0.133         1.236
+ AFFIRM2        0.192         0.307         0.187         0.117         0.864
+ AFFIRM3        0.147         0.223         0.127         0.072         0.842
+ AFFIRM4        0.157         0.170         0.068         0.186         0.831
+ AFFIRM5        0.229         0.130         0.024         0.377         0.607
+ AFFIRM6        0.097         0.211         0.055         0.362         0.707
+ AFFIRM7        0.201         0.246         0.105         0.361         0.556
+
+
+           Covariances
+              AFFIRM2       AFFIRM3       AFFIRM4       AFFIRM5       AFFIRM6
+              ________      ________      ________      ________      ________
+ AFFIRM2        1.167
+ AFFIRM3        0.906         1.148
+ AFFIRM4        0.828         0.956         1.324
+ AFFIRM5        0.559         0.639         0.814         1.562
+ AFFIRM6        0.625         0.697         0.813         0.886         1.475
+ AFFIRM7        0.526         0.589         0.712         0.980         0.858
+
+
+           Covariances
+              AFFIRM7
+              ________
+ AFFIRM7        1.413
+
+
+           Correlations
+              HOMON1        HOMON2        HOMON3        HOMON4        HOMON5
+              ________      ________      ________      ________      ________
+ HOMON1         1.000
+ HOMON2         0.784         1.000
+ HOMON3         0.650         0.653         1.000
+ HOMON4         0.747         0.754         0.716         1.000
+ HOMON5         0.447         0.414         0.407         0.482         1.000
+ HOMON6         0.603         0.590         0.635         0.664         0.586
+ HOMON7         0.454         0.451         0.428         0.493         0.718
+ HOMON8         0.673         0.686         0.650         0.695         0.486
+ HOMON9         0.625         0.624         0.582         0.616         0.419
+ HOMON10        0.578         0.584         0.562         0.593         0.427
+ HOMON11        0.391         0.370         0.350         0.409         0.415
+ CONCEAL1       0.258         0.237         0.207         0.209         0.238
+ CONCEAL2       0.318         0.316         0.286         0.292         0.255
+ CONCEAL3       0.213         0.191         0.167         0.234         0.506
+ AFFIRM1       -0.033        -0.036        -0.084        -0.073         0.008
+ AFFIRM2       -0.010        -0.011        -0.032        -0.060         0.000
+ AFFIRM3       -0.072        -0.065        -0.106        -0.117        -0.073
+ AFFIRM4       -0.089        -0.089        -0.112        -0.124        -0.009
+ AFFIRM5       -0.052        -0.043        -0.057        -0.034         0.148
+ AFFIRM6       -0.148        -0.150        -0.201        -0.158         0.021
+ AFFIRM7       -0.032        -0.027        -0.037        -0.013         0.123
+
+
+           Correlations
+              HOMON6        HOMON7        HOMON8        HOMON9        HOMON10
+              ________      ________      ________      ________      ________
+ HOMON6         1.000
+ HOMON7         0.606         1.000
+ HOMON8         0.675         0.532         1.000
+ HOMON9         0.584         0.470         0.718         1.000
+ HOMON10        0.589         0.476         0.658         0.660         1.000
+ HOMON11        0.428         0.433         0.439         0.419         0.471
+ CONCEAL1       0.220         0.187         0.288         0.280         0.264
+ CONCEAL2       0.267         0.236         0.372         0.367         0.333
+ CONCEAL3       0.322         0.425         0.221         0.212         0.230
+ AFFIRM1       -0.125         0.031        -0.041        -0.017         0.001
+ AFFIRM2       -0.118         0.011        -0.009         0.007         0.005
+ AFFIRM3       -0.175        -0.045        -0.086        -0.042        -0.050
+ AFFIRM4       -0.128         0.010        -0.096        -0.061        -0.048
+ AFFIRM5        0.048         0.162        -0.045        -0.036        -0.011
+ AFFIRM6       -0.141         0.011        -0.173        -0.143        -0.126
+ AFFIRM7        0.034         0.152        -0.039        -0.019         0.018
+
+
+           Correlations
+              HOMON11       CONCEAL1      CONCEAL2      CONCEAL3      AFFIRM1
+              ________      ________      ________      ________      ________
+ HOMON11        1.000
+ CONCEAL1       0.236         1.000
+ CONCEAL2       0.247         0.583         1.000
+ CONCEAL3       0.272         0.311         0.336         1.000
+ AFFIRM1        0.177         0.199         0.092         0.095         1.000
+ AFFIRM2        0.146         0.257         0.165         0.087         0.719
+ AFFIRM3        0.113         0.188         0.113         0.053         0.707
+ AFFIRM4        0.112         0.134         0.057         0.129         0.650
+ AFFIRM5        0.151         0.094         0.018         0.241         0.437
+ AFFIRM6        0.066         0.157         0.043         0.238         0.523
+ AFFIRM7        0.139         0.187         0.084         0.243         0.421
+
+
+           Correlations
+              AFFIRM2       AFFIRM3       AFFIRM4       AFFIRM5       AFFIRM6
+              ________      ________      ________      ________      ________
+ AFFIRM2        1.000
+ AFFIRM3        0.782         1.000
+ AFFIRM4        0.666         0.775         1.000
+ AFFIRM5        0.414         0.477         0.566         1.000
+ AFFIRM6        0.476         0.536         0.582         0.584         1.000
+ AFFIRM7        0.410         0.462         0.520         0.659         0.594
+
+
+           Correlations
+              AFFIRM7
+              ________
+ AFFIRM7        1.000
+
+
+     MAXIMUM LOG-LIKELIHOOD VALUE FOR THE UNRESTRICTED (H1) MODEL IS -56306.707
+
+
+UNIVARIATE SAMPLE STATISTICS
+
+
+     UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+         Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
+        Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
+
+     HOMON1                1.816       1.033       1.000   48.19%       1.000      1.000      2.000
+            2266.000       0.907       0.528       5.000    1.46%       2.000      3.000
+     HOMON2                1.788       1.063       1.000   49.21%       1.000      1.000      2.000
+            2266.000       0.872       0.613       5.000    1.28%       2.000      3.000
+     HOMON3                1.688       1.362       1.000   57.77%       1.000      1.000      1.000
+            2266.000       0.924       1.236       5.000    1.59%       2.000      2.000
+     HOMON4                1.829       1.012       1.000   50.62%       1.000      1.000      1.000
+            2266.000       1.010       0.167       5.000    1.32%       2.000      3.000
+     HOMON5                2.643       0.162       1.000   26.04%       1.000      2.000      3.000
+            2266.000       1.633      -1.114       5.000    7.72%       3.000      4.000
+     HOMON6                2.127       0.683       1.000   39.63%       1.000      2.000      2.000
+            2266.000       1.314      -0.579       5.000    2.87%       2.000      3.000
+     HOMON7                2.579       0.155       1.000   26.92%       1.000      2.000      3.000
+            2266.000       1.521      -1.080       5.000    5.56%       3.000      4.000
+     HOMON8                1.842       1.001       1.000   46.95%       1.000      1.000      2.000
+            2266.000       0.932       0.409       5.000    1.46%       2.000      3.000
+     HOMON9                1.832       1.059       1.000   47.57%       1.000      1.000      2.000
+            2266.000       0.944       0.552       5.000    1.59%       2.000      3.000
+     HOMON10               1.955       0.814       1.000   43.60%       1.000      1.000      2.000
+            2266.000       1.039      -0.033       5.000    2.03%       2.000      3.000
+     HOMON11               2.487       0.235       1.000   29.66%       1.000      2.000      3.000
+            2266.000       1.478      -0.998       5.000    5.08%       3.000      4.000
+     CONCEAL1              2.420       0.399       1.000   24.93%       1.000      2.000      2.000
+            2266.000       1.222      -0.450       5.000    4.90%       3.000      3.000
+     CONCEAL2              2.262       0.457       1.000   28.86%       1.000      2.000      2.000
+            2266.000       1.091      -0.381       5.000    2.87%       3.000      3.000
+     CONCEAL3              3.248      -0.323       1.000   13.33%       2.000      3.000      3.000
+            2266.000       1.569      -0.774       5.000   18.36%       4.000      4.000
+     AFFIRM1               2.847       0.006       1.000   15.71%       2.000      3.000      3.000
+            2266.000       1.236      -0.358       5.000    8.87%       3.000      4.000
+     AFFIRM2               2.703       0.096       1.000   17.03%       2.000      3.000      3.000
+            2266.000       1.167      -0.384       5.000    6.22%       3.000      3.000
+     AFFIRM3               2.766       0.092       1.000   15.31%       2.000      3.000      3.000
+            2266.000       1.148      -0.223       5.000    7.46%       3.000      3.000
+     AFFIRM4               3.012      -0.148       1.000   13.81%       2.000      3.000      3.000
+            2266.000       1.324      -0.566       5.000   10.64%       3.000      4.000
+     AFFIRM5               3.450      -0.430       1.000   10.46%       3.000      3.000      3.000
+            2266.000       1.562      -0.677       5.000   25.60%       4.000      5.000
+     AFFIRM6               3.555      -0.594       1.000    9.31%       3.000      3.000      4.000
+            2266.000       1.475      -0.437       5.000   26.08%       4.000      5.000
+     AFFIRM7               3.316      -0.289       1.000   10.11%       2.000      3.000      3.000
+            2266.000       1.413      -0.578       5.000   19.64%       4.000      4.000
+
+
+THE MODEL ESTIMATION TERMINATED NORMALLY
+
+
+
+MODEL FIT INFORMATION
+
+Number of Free Parameters                       64
+
+Loglikelihood
+
+          H0 Value                      -59363.423
+          H0 Scaling Correction Factor      1.4502
+            for MLR
+          H1 Value                      -56306.707
+          H1 Scaling Correction Factor      1.4692
+            for MLR
+
+Information Criteria
+
+          Akaike (AIC)                  118854.846
+          Bayesian (BIC)                119221.295
+          Sample-Size Adjusted BIC      119017.956
+            (n* = (n + 2) / 24)
+
+Chi-Square Test of Model Fit
+
+          Value                           4142.904*
+          Degrees of Freedom                   188
+          P-Value                           0.0000
+          Scaling Correction Factor         1.4756
+            for MLR
+
+*   The chi-square value for MLM, MLMV, MLR, ULSMV, WLSM and WLSMV cannot be used
+    for chi-square difference testing in the regular way.  MLM, MLR and WLSM
+    chi-square difference testing is described on the Mplus website.  MLMV, WLSMV,
+    and ULSMV difference testing is done using the DIFFTEST option.
+
+RMSEA (Root Mean Square Error Of Approximation)
+
+          Estimate                           0.096
+          90 Percent C.I.                    0.094  0.099
+          Probability RMSEA <= .05           0.000
+
+CFI/TLI
+
+          CFI                                0.798
+          TLI                                0.775
+
+Chi-Square Test of Model Fit for the Baseline Model
+
+          Value                          19826.585
+          Degrees of Freedom                   210
+          P-Value                           0.0000
+
+SRMR (Standardized Root Mean Square Residual)
+
+          Value                              0.091
+
+
+
+MODEL RESULTS
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ HOMONCON BY
+    HOMON1             1.000      0.000    999.000    999.000
+    HOMON2             0.979      0.020     49.423      0.000
+    HOMON3             0.949      0.026     37.149      0.000
+    HOMON4             1.086      0.020     53.987      0.000
+    HOMON5             0.985      0.036     27.375      0.000
+    HOMON6             1.147      0.030     38.549      0.000
+    HOMON7             0.997      0.035     28.636      0.000
+    HOMON8             1.040      0.025     41.168      0.000
+    HOMON9             0.959      0.028     34.390      0.000
+    HOMON10            0.967      0.028     34.055      0.000
+    HOMON11            0.808      0.033     24.216      0.000
+    CONCEAL1           0.459      0.033     13.952      0.000
+    CONCEAL2           0.545      0.031     17.441      0.000
+    CONCEAL3           0.520      0.039     13.492      0.000
+
+ AFFIRM   BY
+    AFFIRM1            1.000      0.000    999.000    999.000
+    AFFIRM2            1.009      0.021     48.723      0.000
+    AFFIRM3            1.081      0.023     46.871      0.000
+    AFFIRM4            1.114      0.027     41.629      0.000
+    AFFIRM5            0.868      0.037     23.686      0.000
+    AFFIRM6            0.915      0.034     27.273      0.000
+    AFFIRM7            0.799      0.036     22.173      0.000
+
+ HOMONCON WITH
+    AFFIRM            -0.055      0.019     -2.892      0.004
+
+ Intercepts
+    HOMON1             1.816      0.020     90.791      0.000
+    HOMON2             1.788      0.020     91.111      0.000
+    HOMON3             1.688      0.020     83.609      0.000
+    HOMON4             1.829      0.021     86.605      0.000
+    HOMON5             2.643      0.027     98.456      0.000
+    HOMON6             2.127      0.024     88.327      0.000
+    HOMON7             2.579      0.026     99.567      0.000
+    HOMON8             1.842      0.020     90.831      0.000
+    HOMON9             1.832      0.020     89.789      0.000
+    HOMON10            1.955      0.021     91.279      0.000
+    HOMON11            2.487      0.026     97.386      0.000
+    CONCEAL1           2.420      0.023    104.197      0.000
+    CONCEAL2           2.262      0.022    103.083      0.000
+    CONCEAL3           3.248      0.026    123.455      0.000
+    AFFIRM1            2.847      0.023    121.872      0.000
+    AFFIRM2            2.703      0.023    119.092      0.000
+    AFFIRM3            2.766      0.023    122.877      0.000
+    AFFIRM4            3.012      0.024    124.593      0.000
+    AFFIRM5            3.450      0.026    131.406      0.000
+    AFFIRM6            3.555      0.026    139.342      0.000
+    AFFIRM7            3.316      0.025    132.804      0.000
+
+ Variances
+    HOMONCON           0.616      0.029     21.502      0.000
+    AFFIRM             0.777      0.038     20.681      0.000
+
+ Residual Variances
+    HOMON1             0.290      0.018     16.284      0.000
+    HOMON2             0.282      0.020     13.840      0.000
+    HOMON3             0.369      0.021     17.476      0.000
+    HOMON4             0.283      0.017     17.049      0.000
+    HOMON5             1.035      0.034     30.022      0.000
+    HOMON6             0.503      0.026     19.543      0.000
+    HOMON7             0.908      0.032     28.507      0.000
+    HOMON8             0.266      0.017     15.474      0.000
+    HOMON9             0.377      0.024     15.567      0.000
+    HOMON10            0.463      0.028     16.741      0.000
+    HOMON11            1.075      0.038     28.513      0.000
+    CONCEAL1           1.093      0.036     30.431      0.000
+    CONCEAL2           0.908      0.032     28.022      0.000
+    CONCEAL3           1.402      0.033     42.406      0.000
+    AFFIRM1            0.460      0.030     15.542      0.000
+    AFFIRM2            0.377      0.024     15.731      0.000
+    AFFIRM3            0.241      0.018     13.143      0.000
+    AFFIRM4            0.361      0.024     15.130      0.000
+    AFFIRM5            0.976      0.038     25.906      0.000
+    AFFIRM6            0.825      0.034     24.482      0.000
+    AFFIRM7            0.918      0.036     25.187      0.000
+
+
+STANDARDIZED MODEL RESULTS
+
+
+STDYX Standardization
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ HOMONCON BY
+    HOMON1             0.824      0.011     73.685      0.000
+    HOMON2             0.823      0.013     61.714      0.000
+    HOMON3             0.775      0.013     60.510      0.000
+    HOMON4             0.848      0.009     91.732      0.000
+    HOMON5             0.605      0.016     37.510      0.000
+    HOMON6             0.786      0.012     67.171      0.000
+    HOMON7             0.635      0.016     40.495      0.000
+    HOMON8             0.845      0.010     82.505      0.000
+    HOMON9             0.775      0.015     52.960      0.000
+    HOMON10            0.744      0.015     48.673      0.000
+    HOMON11            0.522      0.019     27.811      0.000
+    CONCEAL1           0.326      0.023     14.356      0.000
+    CONCEAL2           0.410      0.022     18.601      0.000
+    CONCEAL3           0.326      0.021     15.449      0.000
+
+ AFFIRM   BY
+    AFFIRM1            0.793      0.015     54.428      0.000
+    AFFIRM2            0.823      0.013     65.166      0.000
+    AFFIRM3            0.889      0.009     97.231      0.000
+    AFFIRM4            0.853      0.011     80.780      0.000
+    AFFIRM5            0.612      0.020     30.195      0.000
+    AFFIRM6            0.664      0.018     36.845      0.000
+    AFFIRM7            0.592      0.022     27.434      0.000
+
+ HOMONCON WITH
+    AFFIRM            -0.079      0.027     -2.891      0.004
+
+ Intercepts
+    HOMON1             1.907      0.024     78.774      0.000
+    HOMON2             1.914      0.024     78.194      0.000
+    HOMON3             1.756      0.022     79.582      0.000
+    HOMON4             1.819      0.020     88.771      0.000
+    HOMON5             2.068      0.027     77.536      0.000
+    HOMON6             1.856      0.021     90.397      0.000
+    HOMON7             2.092      0.027     76.792      0.000
+    HOMON8             1.908      0.024     80.198      0.000
+    HOMON9             1.886      0.024     79.616      0.000
+    HOMON10            1.918      0.023     81.712      0.000
+    HOMON11            2.046      0.026     77.782      0.000
+    CONCEAL1           2.189      0.030     73.996      0.000
+    CONCEAL2           2.165      0.029     74.619      0.000
+    CONCEAL3           2.593      0.041     62.527      0.000
+    AFFIRM1            2.560      0.040     63.561      0.000
+    AFFIRM2            2.502      0.038     65.669      0.000
+    AFFIRM3            2.581      0.041     63.689      0.000
+    AFFIRM4            2.617      0.041     63.549      0.000
+    AFFIRM5            2.760      0.046     60.559      0.000
+    AFFIRM6            2.927      0.052     56.482      0.000
+    AFFIRM7            2.790      0.045     62.105      0.000
+
+ Variances
+    HOMONCON           1.000      0.000    999.000    999.000
+    AFFIRM             1.000      0.000    999.000    999.000
+
+ Residual Variances
+    HOMON1             0.320      0.018     17.371      0.000
+    HOMON2             0.323      0.022     14.703      0.000
+    HOMON3             0.399      0.020     20.126      0.000
+    HOMON4             0.280      0.016     17.878      0.000
+    HOMON5             0.634      0.020     32.429      0.000
+    HOMON6             0.383      0.018     20.824      0.000
+    HOMON7             0.597      0.020     30.035      0.000
+    HOMON8             0.286      0.017     16.504      0.000
+    HOMON9             0.400      0.023     17.629      0.000
+    HOMON10            0.446      0.023     19.592      0.000
+    HOMON11            0.728      0.020     37.135      0.000
+    CONCEAL1           0.894      0.015     60.491      0.000
+    CONCEAL2           0.832      0.018     46.057      0.000
+    CONCEAL3           0.894      0.014     64.967      0.000
+    AFFIRM1            0.372      0.023     16.096      0.000
+    AFFIRM2            0.323      0.021     15.534      0.000
+    AFFIRM3            0.210      0.016     12.927      0.000
+    AFFIRM4            0.272      0.018     15.121      0.000
+    AFFIRM5            0.625      0.025     25.188      0.000
+    AFFIRM6            0.559      0.024     23.389      0.000
+    AFFIRM7            0.649      0.026     25.407      0.000
+
+
+STDY Standardization
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ HOMONCON BY
+    HOMON1             0.824      0.011     73.685      0.000
+    HOMON2             0.823      0.013     61.714      0.000
+    HOMON3             0.775      0.013     60.510      0.000
+    HOMON4             0.848      0.009     91.732      0.000
+    HOMON5             0.605      0.016     37.510      0.000
+    HOMON6             0.786      0.012     67.171      0.000
+    HOMON7             0.635      0.016     40.495      0.000
+    HOMON8             0.845      0.010     82.505      0.000
+    HOMON9             0.775      0.015     52.960      0.000
+    HOMON10            0.744      0.015     48.673      0.000
+    HOMON11            0.522      0.019     27.811      0.000
+    CONCEAL1           0.326      0.023     14.356      0.000
+    CONCEAL2           0.410      0.022     18.601      0.000
+    CONCEAL3           0.326      0.021     15.449      0.000
+
+ AFFIRM   BY
+    AFFIRM1            0.793      0.015     54.428      0.000
+    AFFIRM2            0.823      0.013     65.166      0.000
+    AFFIRM3            0.889      0.009     97.231      0.000
+    AFFIRM4            0.853      0.011     80.780      0.000
+    AFFIRM5            0.612      0.020     30.195      0.000
+    AFFIRM6            0.664      0.018     36.845      0.000
+    AFFIRM7            0.592      0.022     27.434      0.000
+
+ HOMONCON WITH
+    AFFIRM            -0.079      0.027     -2.891      0.004
+
+ Intercepts
+    HOMON1             1.907      0.024     78.774      0.000
+    HOMON2             1.914      0.024     78.194      0.000
+    HOMON3             1.756      0.022     79.582      0.000
+    HOMON4             1.819      0.020     88.771      0.000
+    HOMON5             2.068      0.027     77.536      0.000
+    HOMON6             1.856      0.021     90.397      0.000
+    HOMON7             2.092      0.027     76.792      0.000
+    HOMON8             1.908      0.024     80.198      0.000
+    HOMON9             1.886      0.024     79.616      0.000
+    HOMON10            1.918      0.023     81.712      0.000
+    HOMON11            2.046      0.026     77.782      0.000
+    CONCEAL1           2.189      0.030     73.996      0.000
+    CONCEAL2           2.165      0.029     74.619      0.000
+    CONCEAL3           2.593      0.041     62.527      0.000
+    AFFIRM1            2.560      0.040     63.561      0.000
+    AFFIRM2            2.502      0.038     65.669      0.000
+    AFFIRM3            2.581      0.041     63.689      0.000
+    AFFIRM4            2.617      0.041     63.549      0.000
+    AFFIRM5            2.760      0.046     60.559      0.000
+    AFFIRM6            2.927      0.052     56.482      0.000
+    AFFIRM7            2.790      0.045     62.105      0.000
+
+ Variances
+    HOMONCON           1.000      0.000    999.000    999.000
+    AFFIRM             1.000      0.000    999.000    999.000
+
+ Residual Variances
+    HOMON1             0.320      0.018     17.371      0.000
+    HOMON2             0.323      0.022     14.703      0.000
+    HOMON3             0.399      0.020     20.126      0.000
+    HOMON4             0.280      0.016     17.878      0.000
+    HOMON5             0.634      0.020     32.429      0.000
+    HOMON6             0.383      0.018     20.824      0.000
+    HOMON7             0.597      0.020     30.035      0.000
+    HOMON8             0.286      0.017     16.504      0.000
+    HOMON9             0.400      0.023     17.629      0.000
+    HOMON10            0.446      0.023     19.592      0.000
+    HOMON11            0.728      0.020     37.135      0.000
+    CONCEAL1           0.894      0.015     60.491      0.000
+    CONCEAL2           0.832      0.018     46.057      0.000
+    CONCEAL3           0.894      0.014     64.967      0.000
+    AFFIRM1            0.372      0.023     16.096      0.000
+    AFFIRM2            0.323      0.021     15.534      0.000
+    AFFIRM3            0.210      0.016     12.927      0.000
+    AFFIRM4            0.272      0.018     15.121      0.000
+    AFFIRM5            0.625      0.025     25.188      0.000
+    AFFIRM6            0.559      0.024     23.389      0.000
+    AFFIRM7            0.649      0.026     25.407      0.000
+
+
+STD Standardization
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ HOMONCON BY
+    HOMON1             0.785      0.018     43.004      0.000
+    HOMON2             0.769      0.019     40.247      0.000
+    HOMON3             0.745      0.020     36.916      0.000
+    HOMON4             0.853      0.017     48.752      0.000
+    HOMON5             0.774      0.023     33.167      0.000
+    HOMON6             0.900      0.019     48.385      0.000
+    HOMON7             0.783      0.022     34.996      0.000
+    HOMON8             0.816      0.018     46.197      0.000
+    HOMON9             0.753      0.020     38.510      0.000
+    HOMON10            0.759      0.019     40.162      0.000
+    HOMON11            0.634      0.023     27.101      0.000
+    CONCEAL1           0.360      0.025     14.486      0.000
+    CONCEAL2           0.428      0.023     18.379      0.000
+    CONCEAL3           0.408      0.028     14.446      0.000
+
+ AFFIRM   BY
+    AFFIRM1            0.881      0.021     41.362      0.000
+    AFFIRM2            0.889      0.020     44.236      0.000
+    AFFIRM3            0.952      0.018     52.206      0.000
+    AFFIRM4            0.982      0.019     51.908      0.000
+    AFFIRM5            0.765      0.030     25.630      0.000
+    AFFIRM6            0.806      0.028     29.130      0.000
+    AFFIRM7            0.704      0.030     23.812      0.000
+
+ HOMONCON WITH
+    AFFIRM            -0.079      0.027     -2.891      0.004
+
+ Intercepts
+    HOMON1             1.816      0.020     90.791      0.000
+    HOMON2             1.788      0.020     91.111      0.000
+    HOMON3             1.688      0.020     83.609      0.000
+    HOMON4             1.829      0.021     86.605      0.000
+    HOMON5             2.643      0.027     98.456      0.000
+    HOMON6             2.127      0.024     88.327      0.000
+    HOMON7             2.579      0.026     99.567      0.000
+    HOMON8             1.842      0.020     90.831      0.000
+    HOMON9             1.832      0.020     89.789      0.000
+    HOMON10            1.955      0.021     91.279      0.000
+    HOMON11            2.487      0.026     97.386      0.000
+    CONCEAL1           2.420      0.023    104.197      0.000
+    CONCEAL2           2.262      0.022    103.083      0.000
+    CONCEAL3           3.248      0.026    123.455      0.000
+    AFFIRM1            2.847      0.023    121.872      0.000
+    AFFIRM2            2.703      0.023    119.092      0.000
+    AFFIRM3            2.766      0.023    122.877      0.000
+    AFFIRM4            3.012      0.024    124.593      0.000
+    AFFIRM5            3.450      0.026    131.406      0.000
+    AFFIRM6            3.555      0.026    139.342      0.000
+    AFFIRM7            3.316      0.025    132.804      0.000
+
+ Variances
+    HOMONCON           1.000      0.000    999.000    999.000
+    AFFIRM             1.000      0.000    999.000    999.000
+
+ Residual Variances
+    HOMON1             0.290      0.018     16.284      0.000
+    HOMON2             0.282      0.020     13.840      0.000
+    HOMON3             0.369      0.021     17.476      0.000
+    HOMON4             0.283      0.017     17.049      0.000
+    HOMON5             1.035      0.034     30.022      0.000
+    HOMON6             0.503      0.026     19.543      0.000
+    HOMON7             0.908      0.032     28.507      0.000
+    HOMON8             0.266      0.017     15.474      0.000
+    HOMON9             0.377      0.024     15.567      0.000
+    HOMON10            0.463      0.028     16.741      0.000
+    HOMON11            1.075      0.038     28.513      0.000
+    CONCEAL1           1.093      0.036     30.431      0.000
+    CONCEAL2           0.908      0.032     28.022      0.000
+    CONCEAL3           1.402      0.033     42.406      0.000
+    AFFIRM1            0.460      0.030     15.542      0.000
+    AFFIRM2            0.377      0.024     15.731      0.000
+    AFFIRM3            0.241      0.018     13.143      0.000
+    AFFIRM4            0.361      0.024     15.130      0.000
+    AFFIRM5            0.976      0.038     25.906      0.000
+    AFFIRM6            0.825      0.034     24.482      0.000
+    AFFIRM7            0.918      0.036     25.187      0.000
+
+
+R-SQUARE
+
+    Observed                                        Two-Tailed
+    Variable        Estimate       S.E.  Est./S.E.    P-Value
+
+    HOMON1             0.680      0.018     36.842      0.000
+    HOMON2             0.677      0.022     30.857      0.000
+    HOMON3             0.601      0.020     30.255      0.000
+    HOMON4             0.720      0.016     45.866      0.000
+    HOMON5             0.366      0.020     18.755      0.000
+    HOMON6             0.617      0.018     33.585      0.000
+    HOMON7             0.403      0.020     20.247      0.000
+    HOMON8             0.714      0.017     41.252      0.000
+    HOMON9             0.600      0.023     26.480      0.000
+    HOMON10            0.554      0.023     24.336      0.000
+    HOMON11            0.272      0.020     13.906      0.000
+    CONCEAL1           0.106      0.015      7.178      0.000
+    CONCEAL2           0.168      0.018      9.300      0.000
+    CONCEAL3           0.106      0.014      7.724      0.000
+    AFFIRM1            0.628      0.023     27.214      0.000
+    AFFIRM2            0.677      0.021     32.583      0.000
+    AFFIRM3            0.790      0.016     48.615      0.000
+    AFFIRM4            0.728      0.018     40.390      0.000
+    AFFIRM5            0.375      0.025     15.097      0.000
+    AFFIRM6            0.441      0.024     18.423      0.000
+    AFFIRM7            0.351      0.026     13.717      0.000
+
+
+QUALITY OF NUMERICAL RESULTS
+
+     Condition Number for the Information Matrix              0.187E-01
+       (ratio of smallest to largest eigenvalue)
+
+
+PLOT INFORMATION
+
+The following plots are available:
+
+  No plots are available
+
+     Beginning Time:  17:45:40
+        Ending Time:  17:45:40
+       Elapsed Time:  00:00:00
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2019 Muthen & Muthen

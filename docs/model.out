@@ -1,0 +1,1313 @@
+Mplus VERSION 8.3 (Mac)
+MUTHEN & MUTHEN
+05/05/2026   5:45 PM
+
+INPUT INSTRUCTIONS
+
+  TITLE:
+  model;
+  DATA:
+  FILE = "model.dat";
+  VARIABLE:
+  NAMES = Code FourDSQ PHQ9 GAD7 Direct Medium Group Appear Body Age GenderId SexPanBi
+       SexOther EduBelo EduAbov SocLad EmpStu EmpUnemp EmpOth Out WomPtn D1 D2 D3 IH1
+       IH2 IH3 A1 A2 A3;
+   MISSING=.;
+   usevar = FourDSQ - A3;
+     categorical = Direct Medium Group Appear Body;
+      auxiliary = Code;
+  ANALYSIS:
+  estimator = ML;
+      bootstrap = 1000;
+      processors = 20;
+  MODEL:
+
+     IP by FourDSQ PHQ9 GAD7;
+     IP by FourDSQ@1;
+
+     D by D1 D2 D3;
+     D by D1@1;
+
+     IH by IH1 IH2 IH3;
+     IH by IH1@1;
+
+     A by A1 A2 A3;
+     A by A1@1;
+
+     IH with A;
+
+     D with IP;
+
+     IH on Age GenderId SexPanBi SexOther
+     out WomPtn EduBelo EduAbov
+     EmpStu EmpUnemp EmpOth SocLad;
+
+     A on Age GenderId SexPanBi SexOther
+     out WomPtn EduBelo EduAbov
+     EmpStu EmpUnemp EmpOth SocLad;
+
+     IP on
+     Direct Medium Group Appear Body
+     IH A Age GenderId SexPanBi SexOther
+     out WomPtn EduBelo EduAbov
+     EmpStu EmpUnemp EmpOth SocLad;
+
+     D on
+     Direct Medium Group Appear Body
+     IH A Age GenderId SexPanBi SexOther
+     out WomPtn EduBelo EduAbov
+     EmpStu EmpUnemp EmpOth SocLad;
+
+     Direct on
+     IH A Age GenderId SexPanBi SexOther
+     out WomPtn EduBelo EduAbov
+     EmpStu EmpUnemp EmpOth SocLad;
+
+     Medium on
+     IH A Age GenderId SexPanBi SexOther
+     out WomPtn EduBelo EduAbov
+     EmpStu EmpUnemp EmpOth SocLad;
+
+     Group on
+     IH A Age GenderId SexPanBi SexOther
+     out WomPtn EduBelo EduAbov
+     EmpStu EmpUnemp EmpOth SocLad;
+
+     Appear on
+     IH A Age GenderId SexPanBi SexOther
+     out WomPtn EduBelo EduAbov
+     EmpStu EmpUnemp EmpOth SocLad;
+
+     Body on
+     IH A Age GenderId SexPanBi SexOther
+     out WomPtn EduBelo EduAbov
+     EmpStu EmpUnemp EmpOth SocLad;
+
+     Group on
+     IH A Age GenderId SexPanBi SexOther
+     out WomPtn EduBelo EduAbov
+     EmpStu EmpUnemp EmpOth SocLad;
+
+     !A-paths;
+     Direct on IH (a11);
+     Direct on A (a12);
+     Medium on IH (a21);
+     Medium on A (a22);
+     Group on IH (a31);
+     Group on A (a32);
+     Appear on IH (a41);
+     Appear on A (a42);
+     Body on IH (a51);
+     Body on A (a52);
+
+     !B-paths;
+     D on Direct (b11);
+     D on Medium (b21);
+     D on Group (b31);
+     D on Appear (b41);
+     D on Body (b51);
+     IP on Direct (b12);
+     IP on Medium (b22);
+     IP on Group (b32);
+     IP on Appear (b42);
+     IP on Body (b52);
+
+  MODEL CONSTRAINT:
+
+    !Indirect effects;
+    !First digit: Predictor, 1 = IH, 2 = A;
+    !Second digit: Mediator, 1 = Direct, 2 = Medium, 3 = Group,
+    !4 = Appear, 5 = Body;
+    !Third digit: Outcome, 1 = D, 2 = IP;
+    !Mediator = Direct;
+    NEW(ind111 ind112 ind211 ind212);
+    ind111 = a11*b11;
+    ind112 = a11*b12;
+    ind211 = a12*b11;
+    ind212 = a12*b12;
+
+    !Mediator = Medium;
+    NEW(ind121 ind122 ind221 ind222);
+    ind121 = a21*b21;
+    ind122 = a21*b22;
+    ind221 = a22*b21;
+    ind222 = a22*b22;
+
+    !Mediator = Group;
+    NEW(ind131 ind132 ind231 ind232);
+    ind131 = a31*b31;
+    ind132 = a31*b32;
+    ind231 = a32*b31;
+    ind232 = a32*b32;
+
+    !Mediator = Appear;
+    NEW(ind141 ind142 ind241 ind242);
+    ind141 = a41*b41;
+    ind142 = a41*b42;
+    ind241 = a42*b41;
+    ind242 = a42*b42;
+
+    !Mediator = Body;
+    NEW(ind151 ind152 ind251 ind252);
+    ind151 = a51*b51;
+    ind152 = a51*b52;
+    ind251 = a52*b51;
+    ind252 = a52*b52;
+
+  OUTPUT:
+  sampstat cinterval (bcbootstrap); ! bias-corrected bootstrap
+  PLOT:
+  type=plot2;
+
+
+
+INPUT READING TERMINATED NORMALLY
+
+
+
+
+model;
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                        2266
+
+Number of dependent variables                                   17
+Number of independent variables                                 12
+Number of continuous latent variables                            4
+
+Observed dependent variables
+
+  Continuous
+   FOURDSQ     PHQ9        GAD7        D1          D2          D3
+   IH1         IH2         IH3         A1          A2          A3
+
+  Binary and ordered categorical (ordinal)
+   DIRECT      MEDIUM      GROUP       APPEAR      BODY
+
+Observed independent variables
+   AGE         GENDERID    SEXPANBI    SEXOTHER    EDUBELO     EDUABOV
+   SOCLAD      EMPSTU      EMPUNEMP    EMPOTH      OUT         WOMPTN
+
+Observed auxiliary variables
+   CODE
+
+Continuous latent variables
+   IP          D           IH          A
+
+
+Estimator                                                       ML
+Information matrix                                        OBSERVED
+Optimization Specifications for the Quasi-Newton Algorithm for
+Continuous Outcomes
+  Maximum number of iterations                                 100
+  Convergence criterion                                  0.100D-05
+Optimization Specifications for the EM Algorithm
+  Maximum number of iterations                                 500
+  Convergence criteria
+    Loglikelihood change                                 0.100D-02
+    Relative loglikelihood change                        0.100D-05
+    Derivative                                           0.100D-02
+Optimization Specifications for the M step of the EM Algorithm for
+Categorical Latent variables
+  Number of M step iterations                                    1
+  M step convergence criterion                           0.100D-02
+  Basis for M step termination                           ITERATION
+Optimization Specifications for the M step of the EM Algorithm for
+Censored, Binary or Ordered Categorical (Ordinal), Unordered
+Categorical (Nominal) and Count Outcomes
+  Number of M step iterations                                    1
+  M step convergence criterion                           0.100D-02
+  Basis for M step termination                           ITERATION
+  Maximum value for logit thresholds                            15
+  Minimum value for logit thresholds                           -15
+  Minimum expected cell size for chi-square              0.100D-01
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+Number of bootstrap draws
+    Requested                                                 1000
+    Completed                                                 1000
+Optimization algorithm                                         EMA
+Integration Specifications
+  Type                                                    STANDARD
+  Number of integration points                                  15
+  Dimensions of numerical integration                            2
+  Adaptive quadrature                                           ON
+Link                                                         LOGIT
+Cholesky                                                       OFF
+
+Input data file(s)
+  model.dat
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns             1
+     Number of y missing data patterns           1
+     Number of u missing data patterns           1
+
+
+COVARIANCE COVERAGE OF DATA
+
+Minimum covariance coverage value   0.100
+
+
+     PROPORTION OF DATA PRESENT FOR Y
+
+
+           Covariance Coverage
+              FOURDSQ       PHQ9          GAD7          D1            D2
+              ________      ________      ________      ________      ________
+ FOURDSQ        1.000
+ PHQ9           1.000         1.000
+ GAD7           1.000         1.000         1.000
+ D1             1.000         1.000         1.000         1.000
+ D2             1.000         1.000         1.000         1.000         1.000
+ D3             1.000         1.000         1.000         1.000         1.000
+ IH1            1.000         1.000         1.000         1.000         1.000
+ IH2            1.000         1.000         1.000         1.000         1.000
+ IH3            1.000         1.000         1.000         1.000         1.000
+ A1             1.000         1.000         1.000         1.000         1.000
+ A2             1.000         1.000         1.000         1.000         1.000
+ A3             1.000         1.000         1.000         1.000         1.000
+ AGE            1.000         1.000         1.000         1.000         1.000
+ GENDERID       1.000         1.000         1.000         1.000         1.000
+ SEXPANBI       1.000         1.000         1.000         1.000         1.000
+ SEXOTHER       1.000         1.000         1.000         1.000         1.000
+ EDUBELO        1.000         1.000         1.000         1.000         1.000
+ EDUABOV        1.000         1.000         1.000         1.000         1.000
+ SOCLAD         1.000         1.000         1.000         1.000         1.000
+ EMPSTU         1.000         1.000         1.000         1.000         1.000
+ EMPUNEMP       1.000         1.000         1.000         1.000         1.000
+ EMPOTH         1.000         1.000         1.000         1.000         1.000
+ OUT            1.000         1.000         1.000         1.000         1.000
+ WOMPTN         1.000         1.000         1.000         1.000         1.000
+
+
+           Covariance Coverage
+              D3            IH1           IH2           IH3           A1
+              ________      ________      ________      ________      ________
+ D3             1.000
+ IH1            1.000         1.000
+ IH2            1.000         1.000         1.000
+ IH3            1.000         1.000         1.000         1.000
+ A1             1.000         1.000         1.000         1.000         1.000
+ A2             1.000         1.000         1.000         1.000         1.000
+ A3             1.000         1.000         1.000         1.000         1.000
+ AGE            1.000         1.000         1.000         1.000         1.000
+ GENDERID       1.000         1.000         1.000         1.000         1.000
+ SEXPANBI       1.000         1.000         1.000         1.000         1.000
+ SEXOTHER       1.000         1.000         1.000         1.000         1.000
+ EDUBELO        1.000         1.000         1.000         1.000         1.000
+ EDUABOV        1.000         1.000         1.000         1.000         1.000
+ SOCLAD         1.000         1.000         1.000         1.000         1.000
+ EMPSTU         1.000         1.000         1.000         1.000         1.000
+ EMPUNEMP       1.000         1.000         1.000         1.000         1.000
+ EMPOTH         1.000         1.000         1.000         1.000         1.000
+ OUT            1.000         1.000         1.000         1.000         1.000
+ WOMPTN         1.000         1.000         1.000         1.000         1.000
+
+
+           Covariance Coverage
+              A2            A3            AGE           GENDERID      SEXPANBI
+              ________      ________      ________      ________      ________
+ A2             1.000
+ A3             1.000         1.000
+ AGE            1.000         1.000         1.000
+ GENDERID       1.000         1.000         1.000         1.000
+ SEXPANBI       1.000         1.000         1.000         1.000         1.000
+ SEXOTHER       1.000         1.000         1.000         1.000         1.000
+ EDUBELO        1.000         1.000         1.000         1.000         1.000
+ EDUABOV        1.000         1.000         1.000         1.000         1.000
+ SOCLAD         1.000         1.000         1.000         1.000         1.000
+ EMPSTU         1.000         1.000         1.000         1.000         1.000
+ EMPUNEMP       1.000         1.000         1.000         1.000         1.000
+ EMPOTH         1.000         1.000         1.000         1.000         1.000
+ OUT            1.000         1.000         1.000         1.000         1.000
+ WOMPTN         1.000         1.000         1.000         1.000         1.000
+
+
+           Covariance Coverage
+              SEXOTHER      EDUBELO       EDUABOV       SOCLAD        EMPSTU
+              ________      ________      ________      ________      ________
+ SEXOTHER       1.000
+ EDUBELO        1.000         1.000
+ EDUABOV        1.000         1.000         1.000
+ SOCLAD         1.000         1.000         1.000         1.000
+ EMPSTU         1.000         1.000         1.000         1.000         1.000
+ EMPUNEMP       1.000         1.000         1.000         1.000         1.000
+ EMPOTH         1.000         1.000         1.000         1.000         1.000
+ OUT            1.000         1.000         1.000         1.000         1.000
+ WOMPTN         1.000         1.000         1.000         1.000         1.000
+
+
+           Covariance Coverage
+              EMPUNEMP      EMPOTH        OUT           WOMPTN
+              ________      ________      ________      ________
+ EMPUNEMP       1.000
+ EMPOTH         1.000         1.000
+ OUT            1.000         1.000         1.000
+ WOMPTN         1.000         1.000         1.000         1.000
+
+
+UNIVARIATE PROPORTIONS AND COUNTS FOR CATEGORICAL VARIABLES
+
+    DIRECT
+      Category 1    0.537         1216.000
+      Category 2    0.463         1050.000
+    MEDIUM
+      Category 1    0.714         1619.000
+      Category 2    0.286          647.000
+    GROUP
+      Category 1    0.822         1862.000
+      Category 2    0.178          404.000
+    APPEAR
+      Category 1    0.968         2194.000
+      Category 2    0.032           72.000
+    BODY
+      Category 1    0.957         2169.000
+      Category 2    0.043           97.000
+
+
+SAMPLE STATISTICS
+
+
+     ESTIMATED SAMPLE STATISTICS
+
+
+           Means
+              FOURDSQ       PHQ9          GAD7          D1            D2
+              ________      ________      ________      ________      ________
+                5.917         6.462         4.649         1.282         1.341
+
+
+           Means
+              D3            IH1           IH2           IH3           A1
+              ________      ________      ________      ________      ________
+                1.366         2.006         2.103         2.415         3.177
+
+
+           Means
+              A2            A3            AGE           GENDERID      SEXPANBI
+              ________      ________      ________      ________      ________
+                3.283         2.775        30.043         0.069         0.237
+
+
+           Means
+              SEXOTHER      EDUBELO       EDUABOV       SOCLAD        EMPSTU
+              ________      ________      ________      ________      ________
+                0.027         0.190         0.137         5.124         0.184
+
+
+           Means
+              EMPUNEMP      EMPOTH        OUT           WOMPTN
+              ________      ________      ________      ________
+                0.123         0.096         0.611         0.122
+
+
+           Covariances
+              FOURDSQ       PHQ9          GAD7          D1            D2
+              ________      ________      ________      ________      ________
+ FOURDSQ       52.433
+ PHQ9          24.581        31.700
+ GAD7          19.932        23.061        24.151
+ D1             1.069         0.796         0.689         0.438
+ D2             1.162         0.975         0.782         0.316         0.397
+ D3             1.175         0.944         0.809         0.350         0.319
+ IH1            1.018         1.042         0.958         0.137         0.140
+ IH2            1.425         1.527         1.295         0.167         0.180
+ IH3            1.250         1.363         1.184         0.128         0.134
+ A1             0.670         0.868         0.617         0.035         0.050
+ A2             0.480         0.509         0.352        -0.005         0.000
+ A3             0.392         0.452         0.308         0.042         0.042
+ AGE           -5.095        -6.780        -4.941        -0.190        -0.367
+ GENDERID       0.071         0.121         0.126         0.002         0.004
+ SEXPANBI      -0.067        -0.178        -0.126         0.001        -0.005
+ SEXOTHER      -0.022         0.012         0.005         0.001         0.002
+ EDUBELO       -0.025         0.026         0.047        -0.005        -0.006
+ EDUABOV       -0.059        -0.100        -0.074        -0.003        -0.002
+ SOCLAD        -1.628        -2.582        -2.008        -0.073        -0.061
+ EMPSTU         0.082         0.068         0.050        -0.002         0.006
+ EMPUNEMP       0.094         0.291         0.247         0.009         0.009
+ EMPOTH         0.005        -0.017        -0.017        -0.002        -0.005
+ OUT            0.301         0.324         0.213        -0.001         0.017
+ WOMPTN        -0.048        -0.082        -0.070        -0.001        -0.001
+
+
+           Covariances
+              D3            IH1           IH2           IH3           A1
+              ________      ________      ________      ________      ________
+ D3             0.419
+ IH1            0.152         0.546
+ IH2            0.189         0.492         0.770
+ IH3            0.158         0.443         0.567         0.729
+ A1             0.055         0.023         0.020         0.082         0.949
+ A2             0.002        -0.043        -0.079         0.006         0.821
+ A3             0.036         0.057         0.010         0.023         0.666
+ AGE           -0.287         0.149         0.081         0.332        -0.371
+ GENDERID       0.004         0.007         0.008         0.003         0.004
+ SEXPANBI       0.001         0.043         0.036         0.032        -0.066
+ SEXOTHER       0.002         0.005         0.004         0.002        -0.008
+ EDUBELO       -0.005         0.024         0.013         0.001        -0.035
+ EDUABOV       -0.001        -0.012         0.003         0.011         0.004
+ SOCLAD        -0.095        -0.182        -0.230        -0.209        -0.070
+ EMPSTU         0.003        -0.013        -0.006         0.002         0.028
+ EMPUNEMP       0.012         0.008         0.007         0.003         0.010
+ EMPOTH        -0.002         0.000        -0.003        -0.010        -0.005
+ OUT            0.010        -0.062        -0.060        -0.071         0.103
+ WOMPTN        -0.006         0.022         0.023         0.024        -0.035
+
+
+           Covariances
+              A2            A3            AGE           GENDERID      SEXPANBI
+              ________      ________      ________      ________      ________
+ A2             1.106
+ A3             0.748         1.033
+ AGE           -0.256         0.024        72.943
+ GENDERID       0.002         0.007        -0.014         0.064
+ SEXPANBI      -0.062        -0.039         0.058         0.002         0.181
+ SEXOTHER      -0.009        -0.001        -0.022         0.002        -0.006
+ EDUBELO       -0.032         0.001         0.374         0.005         0.001
+ EDUABOV       -0.007        -0.031         0.126        -0.002         0.003
+ SOCLAD        -0.090        -0.107         0.835         0.006         0.031
+ EMPSTU         0.025         0.003        -1.637         0.002         0.000
+ EMPUNEMP       0.001         0.008         0.105         0.002        -0.006
+ EMPOTH         0.000         0.008         0.355         0.001         0.002
+ OUT            0.109         0.059        -0.389         0.001        -0.046
+ WOMPTN        -0.028        -0.015         0.842         0.002         0.035
+
+
+           Covariances
+              SEXOTHER      EDUBELO       EDUABOV       SOCLAD        EMPSTU
+              ________      ________      ________      ________      ________
+ SEXOTHER       0.026
+ EDUBELO        0.005         0.154
+ EDUABOV       -0.002        -0.026         0.118
+ SOCLAD        -0.015        -0.130         0.137         3.693
+ EMPSTU        -0.001        -0.024         0.014         0.016         0.150
+ EMPUNEMP       0.003         0.011        -0.011        -0.100        -0.023
+ EMPOTH         0.001         0.012        -0.008        -0.015        -0.018
+ OUT           -0.006        -0.017         0.003         0.017         0.018
+ WOMPTN        -0.001         0.009         0.000         0.024        -0.018
+
+
+           Covariances
+              EMPUNEMP      EMPOTH        OUT           WOMPTN
+              ________      ________      ________      ________
+ EMPUNEMP       0.108
+ EMPOTH        -0.012         0.087
+ OUT            0.003         0.001         0.238
+ WOMPTN        -0.004         0.001        -0.025         0.107
+
+
+           Correlations
+              FOURDSQ       PHQ9          GAD7          D1            D2
+              ________      ________      ________      ________      ________
+ FOURDSQ        1.000
+ PHQ9           0.603         1.000
+ GAD7           0.560         0.833         1.000
+ D1             0.223         0.214         0.212         1.000
+ D2             0.255         0.275         0.253         0.759         1.000
+ D3             0.251         0.259         0.254         0.816         0.781
+ IH1            0.190         0.250         0.264         0.280         0.301
+ IH2            0.224         0.309         0.300         0.287         0.325
+ IH3            0.202         0.283         0.282         0.226         0.249
+ A1             0.095         0.158         0.129         0.054         0.081
+ A2             0.063         0.086         0.068        -0.007         0.000
+ A3             0.053         0.079         0.062         0.062         0.065
+ AGE           -0.082        -0.141        -0.118        -0.034        -0.068
+ GENDERID       0.038         0.085         0.101         0.013         0.027
+ SEXPANBI      -0.022        -0.074        -0.060         0.004        -0.019
+ SEXOTHER      -0.019         0.013         0.006         0.007         0.016
+ EDUBELO       -0.009         0.012         0.024        -0.020        -0.023
+ EDUABOV       -0.024        -0.052        -0.044        -0.015        -0.007
+ SOCLAD        -0.117        -0.239        -0.213        -0.058        -0.051
+ EMPSTU         0.029         0.031         0.026        -0.007         0.026
+ EMPUNEMP       0.040         0.158         0.153         0.042         0.042
+ EMPOTH         0.002        -0.010        -0.012        -0.010        -0.025
+ OUT            0.085         0.118         0.089        -0.002         0.054
+ WOMPTN        -0.020        -0.045        -0.044        -0.004        -0.005
+
+
+           Correlations
+              D3            IH1           IH2           IH3           A1
+              ________      ________      ________      ________      ________
+ D3             1.000
+ IH1            0.317         1.000
+ IH2            0.333         0.759         1.000
+ IH3            0.287         0.702         0.757         1.000
+ A1             0.086         0.031         0.024         0.099         1.000
+ A2             0.003        -0.055        -0.086         0.007         0.801
+ A3             0.055         0.075         0.011         0.026         0.673
+ AGE           -0.052         0.024         0.011         0.046        -0.045
+ GENDERID       0.027         0.035         0.035         0.014         0.017
+ SEXPANBI       0.003         0.138         0.096         0.087        -0.160
+ SEXOTHER       0.018         0.046         0.030         0.014        -0.052
+ EDUBELO       -0.018         0.082         0.037         0.003        -0.092
+ EDUABOV       -0.003        -0.046         0.009         0.039         0.011
+ SOCLAD        -0.076        -0.128        -0.137        -0.128        -0.037
+ EMPSTU         0.011        -0.044        -0.017         0.007         0.074
+ EMPUNEMP       0.058         0.034         0.023         0.011         0.030
+ EMPOTH        -0.012        -0.002        -0.012        -0.039        -0.018
+ OUT            0.030        -0.172        -0.141        -0.170         0.217
+ WOMPTN        -0.029         0.091         0.082         0.085        -0.108
+
+
+           Correlations
+              A2            A3            AGE           GENDERID      SEXPANBI
+              ________      ________      ________      ________      ________
+ A2             1.000
+ A3             0.699         1.000
+ AGE           -0.028         0.003         1.000
+ GENDERID       0.007         0.028        -0.006         1.000
+ SEXPANBI      -0.139        -0.091         0.016         0.017         1.000
+ SEXOTHER      -0.050        -0.009        -0.016         0.041        -0.093
+ EDUBELO       -0.078         0.003         0.111         0.046         0.008
+ EDUABOV       -0.020        -0.088         0.043        -0.017         0.022
+ SOCLAD        -0.044        -0.055         0.051         0.013         0.038
+ EMPSTU         0.061         0.007        -0.494         0.019        -0.003
+ EMPUNEMP       0.004         0.025         0.038         0.026        -0.044
+ EMPOTH         0.001         0.026         0.141         0.018         0.015
+ OUT            0.214         0.118        -0.093         0.009        -0.224
+ WOMPTN        -0.081        -0.046         0.301         0.027         0.253
+
+
+           Correlations
+              SEXOTHER      EDUBELO       EDUABOV       SOCLAD        EMPSTU
+              ________      ________      ________      ________      ________
+ SEXOTHER       1.000
+ EDUBELO        0.072         1.000
+ EDUABOV       -0.043        -0.193         1.000
+ SOCLAD        -0.048        -0.173         0.208         1.000
+ EMPSTU        -0.023        -0.158         0.101         0.021         1.000
+ EMPUNEMP       0.054         0.086        -0.098        -0.159        -0.178
+ EMPOTH         0.020         0.101        -0.078        -0.026        -0.155
+ OUT           -0.080        -0.091         0.016         0.019         0.095
+ WOMPTN        -0.012         0.074        -0.003         0.038        -0.142
+
+
+           Correlations
+              EMPUNEMP      EMPOTH        OUT           WOMPTN
+              ________      ________      ________      ________
+ EMPUNEMP       1.000
+ EMPOTH        -0.122         1.000
+ OUT            0.020         0.008         1.000
+ WOMPTN        -0.041         0.011        -0.154         1.000
+
+
+     MAXIMUM LOG-LIKELIHOOD VALUE FOR THE UNRESTRICTED (H1) MODEL IS -55711.307
+
+
+UNIVARIATE SAMPLE STATISTICS
+
+
+     UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+         Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
+        Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
+
+     FOURDSQ               5.917       2.557       0.000   24.93%       0.000      2.000      4.000
+            2266.000      52.433      10.831      64.000    0.09%       5.000     10.000
+     PHQ9                  6.462       1.112       0.000   16.11%       1.000      4.000      6.000
+            2266.000      31.700       1.209      27.000    0.57%       7.000     10.000
+     GAD7                  4.649       1.238       0.000   28.07%       0.000      2.000      3.000
+            2266.000      24.151       1.214      21.000    1.41%       5.000      7.000
+     D1                    1.282       2.822       1.000   80.41%       1.000      1.000      1.000
+            2266.000       0.438       8.746       5.000    0.53%       1.000      1.000
+     D2                    1.341       2.477       1.000   66.77%       1.000      1.000      1.000
+            2266.000       0.397       7.235       5.000    0.31%       1.000      1.500
+     D3                    1.366       2.456       1.000   64.12%       1.000      1.000      1.000
+            2266.000       0.419       7.325       5.000    0.44%       1.000      1.500
+     IH1                   2.006       0.497       1.000   16.20%       1.200      1.800      2.000
+            2266.000       0.546      -0.020       5.000    0.26%       2.200      2.600
+     IH2                   2.103       0.442       1.000   22.90%       1.000      1.750      2.000
+            2266.000       0.770      -0.340       5.000    0.62%       2.250      3.000
+     IH3                   2.415       0.099       1.000    9.66%       1.600      2.200      2.400
+            2266.000       0.729      -0.510       5.000    0.44%       2.600      3.200
+     A1                    3.177      -0.464       1.000    7.37%       2.667      3.000      3.167
+            2266.000       0.949       0.061       5.000    4.46%       3.333      4.000
+     A2                    3.283      -0.491       1.000    8.03%       2.500      3.000      3.500
+            2266.000       1.106      -0.147       5.000    8.34%       3.500      4.000
+     A3                    2.775       0.067       1.000   12.27%       2.000      2.500      3.000
+            2266.000       1.033      -0.163       5.000    5.21%       3.000      3.500
+     AGE                  30.043       0.939      18.000    2.87%      22.000     27.000     29.000
+            2266.000      72.943       0.961      70.000    0.04%      31.000     37.000
+     GENDERID              0.069       3.406       0.000   93.12%       0.000      0.000      0.000
+            2266.000       0.064       9.600       1.000    6.88%       0.000      0.000
+     SEXPANBI              0.237       1.237       0.000   76.30%       0.000      0.000      0.000
+            2266.000       0.181      -0.470       1.000   23.70%       0.000      1.000
+     SEXOTHER              0.027       5.846       0.000   97.31%       0.000      0.000      0.000
+            2266.000       0.026      32.175       1.000    2.69%       0.000      0.000
+     EDUBELO               0.190       1.579       0.000   80.98%       0.000      0.000      0.000
+            2266.000       0.154       0.492       1.000   19.02%       0.000      0.000
+     EDUABOV               0.137       2.108       0.000   86.28%       0.000      0.000      0.000
+            2266.000       0.118       2.445       1.000   13.72%       0.000      0.000
+     SOCLAD                5.124      -0.104       1.000    4.46%       3.000      5.000      5.000
+            2266.000       3.693      -0.167      10.000    1.59%       6.000      7.000
+     EMPSTU                0.184       1.627       0.000   81.55%       0.000      0.000      0.000
+            2266.000       0.150       0.647       1.000   18.45%       0.000      0.000
+     EMPUNEMP              0.123       2.300       0.000   87.73%       0.000      0.000      0.000
+            2266.000       0.108       3.291       1.000   12.27%       0.000      0.000
+     EMPOTH                0.096       2.739       0.000   90.38%       0.000      0.000      0.000
+            2266.000       0.087       5.501       1.000    9.62%       0.000      0.000
+     OUT                   0.611      -0.456       0.000   38.88%       0.000      1.000      1.000
+            2266.000       0.238      -1.792       1.000   61.12%       1.000      1.000
+     WOMPTN                0.122       2.313       0.000   87.82%       0.000      0.000      0.000
+            2266.000       0.107       3.349       1.000   12.18%       0.000      0.000
+
+
+THE MODEL ESTIMATION TERMINATED NORMALLY
+
+
+
+MODEL FIT INFORMATION
+
+Number of Free Parameters                      175
+
+Loglikelihood
+
+          H0 Value                      -41533.090
+
+Information Criteria
+
+          Akaike (AIC)                   83416.180
+          Bayesian (BIC)                 84418.190
+          Sample-Size Adjusted BIC       83862.185
+            (n* = (n + 2) / 24)
+
+
+
+MODEL RESULTS
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+ IP       BY
+    FOURDSQ            1.000      0.000    999.000    999.000
+    PHQ9               1.154      0.059     19.617      0.000
+    GAD7               0.939      0.048     19.413      0.000
+
+ D        BY
+    D1                 1.000      0.000    999.000    999.000
+    D2                 0.919      0.030     30.369      0.000
+    D3                 1.018      0.028     36.650      0.000
+
+ IH       BY
+    IH1                1.000      0.000    999.000    999.000
+    IH2                1.267      0.025     49.725      0.000
+    IH3                1.155      0.025     46.262      0.000
+
+ A        BY
+    A1                 1.000      0.000    999.000    999.000
+    A2                 1.110      0.025     45.046      0.000
+    A3                 0.902      0.022     40.162      0.000
+
+ IP         ON
+    IH                 2.810      0.242     11.591      0.000
+    A                  0.312      0.115      2.708      0.007
+
+ D          ON
+    IH                 0.393      0.032     12.189      0.000
+    A                  0.005      0.014      0.381      0.704
+
+ IH         ON
+    AGE                0.000      0.002     -0.011      0.991
+    GENDERID           0.083      0.050      1.676      0.094
+    SEXPANBI           0.115      0.032      3.551      0.000
+    SEXOTHER           0.086      0.090      0.962      0.336
+    OUT               -0.194      0.029     -6.777      0.000
+    WOMPTN             0.115      0.042      2.751      0.006
+    EDUBELO            0.007      0.036      0.185      0.853
+    EDUABOV            0.068      0.040      1.694      0.090
+    EMPSTU             0.000      0.044      0.009      0.993
+    EMPUNEMP           0.015      0.043      0.338      0.735
+    EMPOTH            -0.046      0.045     -1.034      0.301
+    SOCLAD            -0.053      0.009     -6.151      0.000
+
+ A          ON
+    AGE                0.003      0.003      1.194      0.233
+    GENDERID           0.072      0.075      0.958      0.338
+    SEXPANBI          -0.219      0.047     -4.648      0.000
+    SEXOTHER          -0.237      0.115     -2.060      0.039
+    OUT                0.329      0.042      7.826      0.000
+    WOMPTN            -0.098      0.061     -1.613      0.107
+    EDUBELO           -0.152      0.051     -3.001      0.003
+    EDUABOV           -0.079      0.056     -1.410      0.158
+    EMPSTU             0.120      0.058      2.076      0.038
+    EMPUNEMP           0.038      0.061      0.623      0.533
+    EMPOTH             0.021      0.068      0.314      0.754
+    SOCLAD            -0.025      0.012     -2.049      0.040
+
+ IP         ON
+    DIRECT             0.704      0.211      3.334      0.001
+    MEDIUM             0.547      0.220      2.485      0.013
+    GROUP              0.537      0.276      1.947      0.052
+    APPEAR             0.188      0.612      0.307      0.759
+    BODY               0.824      0.501      1.644      0.100
+    AGE               -0.072      0.013     -5.389      0.000
+    GENDERID           1.362      0.417      3.264      0.001
+    SEXPANBI          -0.636      0.216     -2.943      0.003
+    SEXOTHER          -0.345      0.606     -0.570      0.569
+    OUT                0.920      0.211      4.365      0.000
+    WOMPTN             0.170      0.266      0.638      0.524
+    EDUBELO           -0.074      0.252     -0.294      0.769
+    EDUABOV            0.022      0.246      0.090      0.929
+    EMPSTU            -0.383      0.270     -1.417      0.157
+    EMPUNEMP           1.717      0.350      4.902      0.000
+    EMPOTH             0.309      0.330      0.935      0.350
+    SOCLAD            -0.401      0.053     -7.548      0.000
+
+ D          ON
+    DIRECT             0.035      0.028      1.266      0.206
+    MEDIUM             0.039      0.028      1.379      0.168
+    GROUP              0.132      0.035      3.774      0.000
+    APPEAR             0.116      0.089      1.294      0.196
+    BODY               0.046      0.061      0.747      0.455
+    AGE               -0.003      0.002     -1.539      0.124
+    GENDERID           0.011      0.048      0.238      0.812
+    SEXPANBI          -0.018      0.033     -0.561      0.575
+    SEXOTHER           0.019      0.102      0.183      0.855
+    OUT                0.063      0.028      2.261      0.024
+    WOMPTN            -0.042      0.046     -0.895      0.371
+    EDUBELO           -0.040      0.032     -1.250      0.211
+    EDUABOV           -0.009      0.035     -0.261      0.794
+    EMPSTU            -0.036      0.040     -0.907      0.364
+    EMPUNEMP           0.066      0.040      1.626      0.104
+    EMPOTH            -0.007      0.040     -0.166      0.868
+    SOCLAD            -0.002      0.007     -0.313      0.754
+
+ DIRECT     ON
+    IH                -0.384      0.093     -4.153      0.000
+    A                  0.239      0.062      3.855      0.000
+
+ MEDIUM     ON
+    IH                -0.212      0.099     -2.153      0.031
+    A                  0.186      0.067      2.786      0.005
+
+ GROUP      ON
+    IH                -0.580      0.125     -4.647      0.000
+    A                  0.196      0.080      2.436      0.015
+
+ APPEAR     ON
+    IH                -0.299      0.305     -0.980      0.327
+    A                  0.337      0.219      1.538      0.124
+
+ BODY       ON
+    IH                -0.035      0.225     -0.156      0.876
+    A                  0.032      0.165      0.192      0.848
+
+ DIRECT     ON
+    AGE               -0.014      0.007     -1.863      0.062
+    GENDERID           0.086      0.185      0.464      0.643
+    SEXPANBI          -0.201      0.122     -1.639      0.101
+    SEXOTHER          -0.250      0.281     -0.891      0.373
+    OUT                1.432      0.105     13.657      0.000
+    WOMPTN            -0.178      0.172     -1.033      0.302
+    EDUBELO           -0.304      0.132     -2.301      0.021
+    EDUABOV            0.205      0.140      1.464      0.143
+    EMPSTU             0.066      0.147      0.447      0.655
+    EMPUNEMP          -0.045      0.151     -0.295      0.768
+    EMPOTH             0.044      0.165      0.264      0.791
+    SOCLAD             0.018      0.027      0.693      0.488
+
+ MEDIUM     ON
+    AGE               -0.052      0.009     -5.947      0.000
+    GENDERID           0.039      0.207      0.188      0.851
+    SEXPANBI          -0.414      0.135     -3.070      0.002
+    SEXOTHER          -0.567      0.357     -1.590      0.112
+    OUT                1.064      0.125      8.500      0.000
+    WOMPTN             0.265      0.187      1.417      0.156
+    EDUBELO           -0.173      0.145     -1.192      0.233
+    EDUABOV            0.080      0.149      0.535      0.593
+    EMPSTU             0.198      0.148      1.335      0.182
+    EMPUNEMP           0.461      0.153      3.016      0.003
+    EMPOTH             0.192      0.175      1.097      0.273
+    SOCLAD             0.001      0.028      0.042      0.967
+
+ GROUP      ON
+    AGE               -0.053      0.010     -5.077      0.000
+    GENDERID           0.286      0.231      1.238      0.216
+    SEXPANBI          -0.411      0.172     -2.394      0.017
+    SEXOTHER           0.192      0.399      0.482      0.630
+    OUT                0.982      0.151      6.485      0.000
+    WOMPTN             0.423      0.219      1.932      0.053
+    EDUBELO           -0.450      0.177     -2.539      0.011
+    EDUABOV            0.005      0.177      0.031      0.975
+    EMPSTU             0.022      0.178      0.126      0.899
+    EMPUNEMP           0.188      0.192      0.977      0.329
+    EMPOTH             0.480      0.190      2.523      0.012
+    SOCLAD             0.004      0.033      0.135      0.893
+
+ APPEAR     ON
+    AGE               -0.146      0.029     -5.073      0.000
+    GENDERID           1.206      0.354      3.411      0.001
+    SEXPANBI          -0.201      0.378     -0.532      0.595
+    SEXOTHER           0.685      4.766      0.144      0.886
+    OUT                0.912      0.350      2.606      0.009
+    WOMPTN             1.085      0.517      2.096      0.036
+    EDUBELO           -0.142      0.339     -0.419      0.675
+    EDUABOV           -0.712      2.643     -0.269      0.788
+    EMPSTU            -0.757      0.378     -2.003      0.045
+    EMPUNEMP           0.313      0.398      0.786      0.432
+    EMPOTH             0.674      0.429      1.569      0.117
+    SOCLAD             0.151      0.080      1.890      0.059
+
+ BODY       ON
+    AGE               -0.040      0.020     -2.035      0.042
+    GENDERID           1.158      0.296      3.908      0.000
+    SEXPANBI          -0.042      0.307     -0.135      0.892
+    SEXOTHER           0.482      5.491      0.088      0.930
+    OUT                0.985      0.309      3.190      0.001
+    WOMPTN             0.216      0.440      0.492      0.623
+    EDUBELO           -0.593      0.894     -0.663      0.507
+    EDUABOV           -0.223      0.356     -0.625      0.532
+    EMPSTU             0.207      0.302      0.685      0.493
+    EMPUNEMP          -0.565      1.456     -0.388      0.698
+    EMPOTH             0.473      0.379      1.248      0.212
+    SOCLAD             0.150      0.065      2.313      0.021
+
+ IH       WITH
+    A                  0.024      0.015      1.531      0.126
+
+ D        WITH
+    IP                 0.318      0.065      4.875      0.000
+
+ Intercepts
+    FOURDSQ            9.729      0.601     16.181      0.000
+    PHQ9              10.860      0.614     17.701      0.000
+    GAD7               8.229      0.500     16.470      0.000
+    D1                 1.425      0.086     16.579      0.000
+    D2                 1.472      0.079     18.565      0.000
+    D3                 1.511      0.087     17.324      0.000
+    IH1                2.339      0.090     25.910      0.000
+    IH2                2.525      0.114     22.154      0.000
+    IH3                2.800      0.104     26.956      0.000
+    A1                 3.076      0.121     25.495      0.000
+    A2                 3.171      0.134     23.691      0.000
+    A3                 2.684      0.109     24.539      0.000
+
+ Thresholds
+    DIRECT$1           0.826      0.274      3.014      0.003
+    MEDIUM$1           0.270      0.301      0.898      0.369
+    GROUP$1            0.979      0.355      2.754      0.006
+    APPEAR$1           1.225      0.963      1.272      0.203
+    BODY$1             3.583      0.753      4.760      0.000
+
+ Residual Variances
+    FOURDSQ           31.154      2.197     14.180      0.000
+    PHQ9               3.377      0.490      6.894      0.000
+    GAD7               5.373      0.426     12.613      0.000
+    D1                 0.095      0.008     11.269      0.000
+    D2                 0.107      0.009     12.363      0.000
+    D3                 0.064      0.007      8.735      0.000
+    IH1                0.159      0.008     20.959      0.000
+    IH2                0.149      0.011     14.137      0.000
+    IH3                0.213      0.010     20.604      0.000
+    A1                 0.208      0.016     12.821      0.000
+    A2                 0.193      0.018     10.951      0.000
+    A3                 0.431      0.019     22.695      0.000
+    IP                15.678      1.792      8.751      0.000
+    D                  0.282      0.024     11.957      0.000
+    IH                 0.360      0.017     21.649      0.000
+    A                  0.683      0.032     21.281      0.000
+
+New/Additional Parameters
+    IND111            -0.013      0.011     -1.195      0.232
+    IND112            -0.271      0.109     -2.483      0.013
+    IND211             0.008      0.007      1.123      0.262
+    IND212             0.169      0.071      2.364      0.018
+    IND121            -0.008      0.008     -1.072      0.284
+    IND122            -0.116      0.078     -1.485      0.137
+    IND221             0.007      0.006      1.163      0.245
+    IND222             0.102      0.058      1.745      0.081
+    IND131            -0.077      0.028     -2.767      0.006
+    IND132            -0.312      0.184     -1.697      0.090
+    IND231             0.026      0.013      2.056      0.040
+    IND232             0.105      0.076      1.387      0.165
+    IND141            -0.035      0.042     -0.821      0.412
+    IND142            -0.056      0.287     -0.196      0.845
+    IND241             0.039      0.048      0.812      0.417
+    IND242             0.063      0.262      0.243      0.808
+    IND151            -0.002      0.017     -0.095      0.924
+    IND152            -0.029      0.218     -0.133      0.895
+    IND251             0.001      0.013      0.114      0.909
+    IND252             0.026      0.157      0.166      0.868
+
+
+LOGISTIC REGRESSION ODDS RATIO RESULTS
+
+                                         (Est. - 1) Two-Tailed
+                    Estimate       S.E.     / S.E.    P-Value
+
+ DIRECT     ON
+    IH                 0.681      0.063     -5.064      0.000
+    A                  1.270      0.079      3.428      0.001
+
+ MEDIUM     ON
+    IH                 0.809      0.080     -2.399      0.016
+    A                  1.204      0.080      2.543      0.011
+
+ GROUP      ON
+    IH                 0.560      0.070     -6.299      0.000
+    A                  1.216      0.098      2.212      0.027
+
+ APPEAR     ON
+    IH                 0.741      0.226     -1.143      0.253
+    A                  1.401      0.307      1.305      0.192
+
+ BODY       ON
+    IH                 0.966      0.217     -0.159      0.874
+    A                  1.032      0.170      0.189      0.850
+
+ DIRECT     ON
+    AGE                0.987      0.007     -1.876      0.061
+    GENDERID           1.090      0.202      0.445      0.657
+    SEXPANBI           0.818      0.100     -1.815      0.069
+    SEXOTHER           0.779      0.219     -1.012      0.312
+    OUT                4.188      0.439      7.259      0.000
+    WOMPTN             0.837      0.144     -1.131      0.258
+    EDUBELO            0.738      0.098     -2.690      0.007
+    EDUABOV            1.227      0.172      1.324      0.185
+    EMPSTU             1.068      0.157      0.432      0.666
+    EMPUNEMP           0.956      0.144     -0.302      0.763
+    EMPOTH             1.045      0.172      0.259      0.796
+    SOCLAD             1.019      0.027      0.687      0.492
+
+ MEDIUM     ON
+    AGE                0.949      0.008     -6.104      0.000
+    GENDERID           1.040      0.215      0.184      0.854
+    SEXPANBI           0.661      0.089     -3.803      0.000
+    SEXOTHER           0.567      0.202     -2.139      0.032
+    OUT                2.897      0.362      5.233      0.000
+    WOMPTN             1.303      0.244      1.245      0.213
+    EDUBELO            0.841      0.122     -1.301      0.193
+    EDUABOV            1.083      0.162      0.514      0.607
+    EMPSTU             1.218      0.180      1.211      0.226
+    EMPUNEMP           1.585      0.242      2.417      0.016
+    EMPOTH             1.211      0.212      0.998      0.318
+    SOCLAD             1.001      0.028      0.042      0.967
+
+ GROUP      ON
+    AGE                0.948      0.010     -5.214      0.000
+    GENDERID           1.331      0.307      1.076      0.282
+    SEXPANBI           0.663      0.114     -2.961      0.003
+    SEXOTHER           1.212      0.484      0.438      0.661
+    OUT                2.669      0.404      4.131      0.000
+    WOMPTN             1.527      0.335      1.575      0.115
+    EDUBELO            0.638      0.113     -3.206      0.001
+    EDUABOV            1.005      0.178      0.031      0.976
+    EMPSTU             1.023      0.182      0.125      0.901
+    EMPUNEMP           1.207      0.232      0.891      0.373
+    EMPOTH             1.616      0.307      2.004      0.045
+    SOCLAD             1.005      0.033      0.135      0.893
+
+ APPEAR     ON
+    AGE                0.864      0.025     -5.463      0.000
+    GENDERID           3.340      1.181      1.981      0.048
+    SEXPANBI           0.818      0.309     -0.589      0.556
+    SEXOTHER           1.983      9.450      0.104      0.917
+    OUT                2.490      0.872      1.710      0.087
+    WOMPTN             2.958      1.531      1.279      0.201
+    EDUBELO            0.867      0.294     -0.450      0.653
+    EDUABOV            0.491      1.297     -0.393      0.694
+    EMPSTU             0.469      0.177     -2.994      0.003
+    EMPUNEMP           1.367      0.544      0.675      0.500
+    EMPOTH             1.961      0.842      1.141      0.254
+    SOCLAD             1.163      0.093      1.755      0.079
+
+ BODY       ON
+    AGE                0.960      0.019     -2.077      0.038
+    GENDERID           3.183      0.943      2.315      0.021
+    SEXPANBI           0.959      0.294     -0.138      0.890
+    SEXOTHER           1.620      8.896      0.070      0.944
+    OUT                2.677      0.826      2.030      0.042
+    WOMPTN             1.242      0.546      0.442      0.658
+    EDUBELO            0.553      0.494     -0.905      0.365
+    EDUABOV            0.800      0.285     -0.700      0.484
+    EMPSTU             1.230      0.372      0.619      0.536
+    EMPUNEMP           0.569      0.828     -0.521      0.602
+    EMPOTH             1.605      0.608      0.994      0.320
+    SOCLAD             1.162      0.076      2.148      0.032
+
+
+CONFIDENCE INTERVALS OF MODEL RESULTS
+
+                  Lower .5%  Lower 2.5%    Lower 5%    Estimate    Upper 5%  Upper 2.5%   Upper .5%
+
+ IP       BY
+    FOURDSQ          1.000       1.000       1.000       1.000       1.000       1.000       1.000
+    PHQ9             1.026       1.045       1.065       1.154       1.262       1.281       1.317
+    GAD7             0.821       0.849       0.867       0.939       1.026       1.040       1.073
+
+ D        BY
+    D1               1.000       1.000       1.000       1.000       1.000       1.000       1.000
+    D2               0.845       0.864       0.872       0.919       0.974       0.983       1.003
+    D3               0.942       0.961       0.971       1.018       1.061       1.070       1.088
+
+ IH       BY
+    IH1              1.000       1.000       1.000       1.000       1.000       1.000       1.000
+    IH2              1.203       1.219       1.226       1.267       1.308       1.316       1.330
+    IH3              1.094       1.107       1.116       1.155       1.198       1.205       1.220
+
+ A        BY
+    A1               1.000       1.000       1.000       1.000       1.000       1.000       1.000
+    A2               1.045       1.062       1.070       1.110       1.152       1.162       1.177
+    A3               0.848       0.861       0.866       0.902       0.938       0.946       0.960
+
+ IP       ON
+    IH               2.225       2.373       2.456       2.810       3.247       3.306       3.470
+    A                0.003       0.072       0.109       0.312       0.492       0.531       0.596
+
+ D        ON
+    IH               0.313       0.331       0.341       0.393       0.448       0.457       0.474
+    A               -0.035      -0.023      -0.019       0.005       0.029       0.033       0.041
+
+ IH       ON
+    AGE             -0.007      -0.005      -0.005       0.000       0.003       0.003       0.005
+    GENDERID        -0.042      -0.011       0.006       0.083       0.166       0.182       0.250
+    SEXPANBI         0.015       0.048       0.058       0.115       0.163       0.176       0.199
+    SEXOTHER        -0.145      -0.093      -0.073       0.086       0.230       0.257       0.318
+    OUT             -0.268      -0.251      -0.245      -0.194      -0.149      -0.143      -0.128
+    WOMPTN           0.004       0.036       0.050       0.115       0.187       0.196       0.215
+    EDUBELO         -0.084      -0.062      -0.054       0.007       0.067       0.078       0.099
+    EDUABOV         -0.037      -0.011       0.000       0.068       0.130       0.143       0.167
+    EMPSTU          -0.145      -0.098      -0.079       0.000       0.066       0.076       0.098
+    EMPUNEMP        -0.100      -0.077      -0.063       0.015       0.079       0.090       0.115
+    EMPOTH          -0.170      -0.132      -0.115      -0.046       0.028       0.040       0.075
+    SOCLAD          -0.074      -0.068      -0.066      -0.053      -0.038      -0.037      -0.031
+
+ A        ON
+    AGE             -0.003      -0.002      -0.001       0.003       0.009       0.010       0.011
+    GENDERID        -0.157      -0.080      -0.054       0.072       0.191       0.218       0.261
+    SEXPANBI        -0.340      -0.311      -0.300      -0.219      -0.143      -0.134      -0.106
+    SEXOTHER        -0.578      -0.481      -0.430      -0.237      -0.068      -0.033       0.049
+    OUT              0.215       0.242       0.258       0.329       0.393       0.411       0.437
+    WOMPTN          -0.269      -0.224      -0.206      -0.098      -0.003       0.013       0.044
+    EDUBELO         -0.279      -0.245      -0.227      -0.152      -0.063      -0.048      -0.012
+    EDUABOV         -0.219      -0.189      -0.168      -0.079       0.015       0.033       0.068
+    EMPSTU          -0.025       0.012       0.030       0.120       0.220       0.238       0.275
+    EMPUNEMP        -0.105      -0.066      -0.050       0.038       0.150       0.177       0.217
+    EMPOTH          -0.150      -0.103      -0.077       0.021       0.147       0.166       0.194
+    SOCLAD          -0.055      -0.048      -0.044      -0.025      -0.005       0.000       0.007
+
+ IP       ON
+    DIRECT           0.153       0.282       0.360       0.704       1.044       1.125       1.257
+    MEDIUM          -0.062       0.116       0.178       0.547       0.897       0.993       1.106
+    GROUP           -0.196       0.005       0.052       0.537       0.979       1.086       1.199
+    APPEAR          -1.267      -0.954      -0.732       0.188       1.307       1.460       1.791
+    BODY            -0.324      -0.044       0.047       0.824       1.719       1.867       2.305
+    AGE             -0.110      -0.098      -0.094      -0.072      -0.051      -0.047      -0.039
+    GENDERID         0.385       0.550       0.688       1.362       2.067       2.205       2.454
+    SEXPANBI        -1.165      -1.057      -0.992      -0.636      -0.255      -0.192      -0.123
+    SEXOTHER        -1.907      -1.545      -1.309      -0.345       0.698       0.867       1.373
+    OUT              0.390       0.498       0.573       0.920       1.264       1.349       1.483
+    WOMPTN          -0.525      -0.379      -0.299       0.170       0.601       0.666       0.813
+    EDUBELO         -0.697      -0.542      -0.477      -0.074       0.333       0.412       0.572
+    EDUABOV         -0.667      -0.521      -0.409       0.022       0.398       0.473       0.612
+    EMPSTU          -1.053      -0.907      -0.834      -0.383       0.060       0.152       0.309
+    EMPUNEMP         0.866       1.047       1.140       1.717       2.298       2.427       2.628
+    EMPOTH          -0.477      -0.303      -0.217       0.309       0.878       1.034       1.231
+    SOCLAD          -0.540      -0.504      -0.486      -0.401      -0.320      -0.305      -0.269
+
+ D        ON
+    DIRECT          -0.034      -0.017      -0.009       0.035       0.081       0.089       0.108
+    MEDIUM          -0.031      -0.017      -0.007       0.039       0.086       0.093       0.114
+    GROUP            0.046       0.066       0.078       0.132       0.194       0.206       0.229
+    APPEAR          -0.095      -0.053      -0.030       0.116       0.275       0.293       0.353
+    BODY            -0.100      -0.072      -0.057       0.046       0.145       0.164       0.187
+    AGE             -0.007      -0.006      -0.005      -0.003       0.000       0.001       0.002
+    GENDERID        -0.102      -0.075      -0.061       0.011       0.095       0.112       0.146
+    SEXPANBI        -0.107      -0.083      -0.076      -0.018       0.033       0.046       0.069
+    SEXOTHER        -0.211      -0.150      -0.128       0.019       0.213       0.248       0.326
+    OUT             -0.018       0.000       0.012       0.063       0.105       0.115       0.130
+    WOMPTN          -0.156      -0.136      -0.122      -0.042       0.030       0.050       0.082
+    EDUBELO         -0.122      -0.103      -0.093      -0.040       0.014       0.023       0.038
+    EDUABOV         -0.093      -0.075      -0.063      -0.009       0.051       0.061       0.080
+    EMPSTU          -0.135      -0.112      -0.099      -0.036       0.033       0.047       0.067
+    EMPUNEMP        -0.039      -0.020      -0.005       0.066       0.127       0.144       0.165
+    EMPOTH          -0.106      -0.081      -0.073      -0.007       0.059       0.066       0.090
+    SOCLAD          -0.020      -0.018      -0.016      -0.002       0.009       0.011       0.016
+
+ DIRECT   ON
+    IH              -0.594      -0.567      -0.528      -0.384      -0.234      -0.201      -0.134
+    A                0.066       0.111       0.130       0.239       0.336       0.348       0.380
+
+ MEDIUM   ON
+    IH              -0.469      -0.398      -0.359      -0.212      -0.044      -0.008       0.061
+    A                0.031       0.057       0.068       0.186       0.292       0.316       0.359
+
+ GROUP    ON
+    IH              -0.921      -0.831      -0.799      -0.580      -0.384      -0.344      -0.263
+    A               -0.002       0.040       0.060       0.196       0.328       0.361       0.387
+
+ APPEAR   ON
+    IH              -1.144      -0.924      -0.805      -0.299       0.169       0.238       0.360
+    A               -0.177      -0.080      -0.002       0.337       0.705       0.792       1.006
+
+ BODY     ON
+    IH              -0.669      -0.537      -0.448      -0.035       0.292       0.367       0.546
+    A               -0.384      -0.276      -0.229       0.032       0.301       0.359       0.456
+
+ DIRECT   ON
+    AGE             -0.033      -0.027      -0.025      -0.014      -0.002       0.001       0.006
+    GENDERID        -0.392      -0.277      -0.203       0.086       0.398       0.485       0.573
+    SEXPANBI        -0.529      -0.456      -0.423      -0.201      -0.013       0.023       0.085
+    SEXOTHER        -1.102      -0.833      -0.730      -0.250       0.189       0.274       0.440
+    OUT              1.149       1.198       1.228       1.432       1.586       1.619       1.692
+    WOMPTN          -0.664      -0.533      -0.475      -0.178       0.093       0.141       0.232
+    EDUBELO         -0.627      -0.572      -0.535      -0.304      -0.103      -0.057       0.039
+    EDUABOV         -0.151      -0.077      -0.025       0.205       0.421       0.477       0.556
+    EMPSTU          -0.320      -0.237      -0.175       0.066       0.303       0.356       0.438
+    EMPUNEMP        -0.380      -0.320      -0.275      -0.045       0.212       0.260       0.399
+    EMPOTH          -0.392      -0.265      -0.218       0.044       0.331       0.382       0.478
+    SOCLAD          -0.053      -0.033      -0.026       0.018       0.062       0.071       0.082
+
+ MEDIUM   ON
+    AGE             -0.077      -0.069      -0.066      -0.052      -0.037      -0.035      -0.029
+    GENDERID        -0.533      -0.341      -0.300       0.039       0.377       0.425       0.511
+    SEXPANBI        -0.756      -0.683      -0.634      -0.414      -0.201      -0.161      -0.082
+    SEXOTHER        -1.723      -1.271      -1.176      -0.567      -0.052       0.028       0.232
+    OUT              0.722       0.818       0.865       1.064       1.264       1.311       1.370
+    WOMPTN          -0.212      -0.161      -0.095       0.265       0.548       0.593       0.703
+    EDUBELO         -0.575      -0.454      -0.407      -0.173       0.059       0.101       0.170
+    EDUABOV         -0.376      -0.219      -0.171       0.080       0.319       0.369       0.478
+    EMPSTU          -0.186      -0.103      -0.059       0.198       0.444       0.494       0.580
+    EMPUNEMP        -0.028       0.124       0.194       0.461       0.693       0.739       0.825
+    EMPOTH          -0.259      -0.150      -0.102       0.192       0.470       0.515       0.608
+    SOCLAD          -0.073      -0.055      -0.046       0.001       0.047       0.058       0.072
+
+ GROUP    ON
+    AGE             -0.082      -0.073      -0.070      -0.053      -0.035      -0.032      -0.027
+    GENDERID        -0.393      -0.164      -0.101       0.286       0.633       0.699       0.865
+    SEXPANBI        -0.894      -0.773      -0.712      -0.411      -0.149      -0.097      -0.012
+    SEXOTHER        -1.173      -0.740      -0.510       0.192       0.758       0.861       1.045
+    OUT              0.604       0.679       0.740       0.982       1.221       1.284       1.370
+    WOMPTN          -0.245      -0.076       0.038       0.423       0.761       0.822       0.935
+    EDUBELO         -0.972      -0.803      -0.758      -0.450      -0.177      -0.109      -0.041
+    EDUABOV         -0.484      -0.384      -0.304       0.005       0.269       0.316       0.376
+    EMPSTU          -0.459      -0.333      -0.254       0.022       0.323       0.376       0.447
+    EMPUNEMP        -0.365      -0.205      -0.134       0.188       0.471       0.525       0.618
+    EMPOTH          -0.028       0.070       0.142       0.480       0.771       0.811       0.967
+    SOCLAD          -0.072      -0.057      -0.049       0.004       0.065       0.077       0.089
+
+ APPEAR   ON
+    AGE             -0.229      -0.210      -0.199      -0.146      -0.104      -0.098      -0.080
+    GENDERID        -0.205       0.369       0.482       1.206       1.673       1.774       1.968
+    SEXPANBI        -1.292      -1.030      -0.888      -0.201       0.372       0.454       0.624
+    SEXOTHER       -24.588     -23.453      -0.678       0.685       1.620       1.790       2.207
+    OUT              0.118       0.273       0.383       0.912       1.484       1.624       1.959
+    WOMPTN          -0.655      -0.116       0.181       1.085       1.838       1.946       2.119
+    EDUBELO         -1.130      -0.795      -0.689      -0.142       0.374       0.460       0.612
+    EDUABOV        -25.545      -2.204      -1.885      -0.712       0.068       0.189       0.497
+    EMPSTU          -1.685      -1.440      -1.339      -0.757      -0.126       0.040       0.247
+    EMPUNEMP        -0.891      -0.548      -0.412       0.313       0.894       1.008       1.238
+    EMPOTH          -0.901      -0.253      -0.070       0.674       1.271       1.382       1.622
+    SOCLAD          -0.050      -0.003       0.024       0.151       0.283       0.308       0.357
+
+ BODY     ON
+    AGE             -0.098      -0.087      -0.077      -0.040      -0.012      -0.005       0.004
+    GENDERID         0.103       0.538       0.630       1.158       1.580       1.666       1.859
+    SEXPANBI        -0.905      -0.717      -0.622      -0.042       0.430       0.509       0.629
+    SEXOTHER       -24.840     -23.771      -0.985       0.482       1.404       1.604       1.836
+    OUT              0.273       0.426       0.518       0.985       1.510       1.640       1.896
+    WOMPTN          -1.073      -0.667      -0.503       0.216       0.902       1.021       1.282
+    EDUBELO         -1.751      -1.314      -1.175      -0.593      -0.016       0.049       0.265
+    EDUABOV         -1.218      -0.900      -0.799      -0.223       0.350       0.454       0.591
+    EMPSTU          -0.651      -0.428      -0.342       0.207       0.698       0.779       0.914
+    EMPUNEMP        -2.461      -1.734      -1.513      -0.565       0.163       0.251       0.376
+    EMPOTH          -0.905      -0.423      -0.247       0.473       1.021       1.119       1.265
+    SOCLAD          -0.003       0.027       0.046       0.150       0.256       0.285       0.330
+
+ IH       WITH
+    A               -0.020      -0.009      -0.004       0.024       0.048       0.052       0.060
+
+ D        WITH
+    IP               0.156       0.199       0.222       0.318       0.443       0.456       0.474
+
+ Intercepts
+    FOURDSQ          8.355       8.635       8.862       9.729      10.868      11.002      11.227
+    PHQ9             9.450       9.779       9.962      10.860      11.992      12.148      12.412
+    GAD7             7.076       7.322       7.481       8.229       9.136       9.230       9.458
+    D1               1.210       1.272       1.292       1.425       1.580       1.610       1.647
+    D2               1.272       1.329       1.354       1.472       1.610       1.645       1.674
+    D3               1.292       1.353       1.374       1.511       1.662       1.694       1.733
+    IH1              2.134       2.193       2.219       2.339       2.523       2.550       2.567
+    IH2              2.271       2.342       2.376       2.525       2.751       2.781       2.837
+    IH3              2.570       2.627       2.651       2.800       3.005       3.036       3.082
+    A1               2.758       2.812       2.859       3.076       3.261       3.294       3.359
+    A2               2.806       2.873       2.926       3.171       3.368       3.410       3.485
+    A3               2.381       2.449       2.487       2.684       2.852       2.884       2.944
+
+ Thresholds
+    DIRECT$1         0.826       0.826       0.826       0.826       0.826       0.826       0.826
+    MEDIUM$1         0.270       0.270       0.270       0.270       0.270       0.270       0.270
+    GROUP$1          0.979       0.979       0.979       0.979       0.979       0.979       0.979
+    APPEAR$1         1.225       1.225       1.225       1.225       1.225       1.225       1.225
+    BODY$1           3.583       3.583       3.583       3.583       3.583       3.583       3.583
+
+ Residual Variances
+    FOURDSQ         25.990      27.274      27.989      31.154      35.302      36.356      37.495
+    PHQ9             2.047       2.408       2.514       3.377       4.128       4.299       4.670
+    GAD7             4.435       4.585       4.700       5.373       6.128       6.293       6.546
+    D1               0.076       0.080       0.082       0.095       0.110       0.113       0.118
+    D2               0.084       0.091       0.093       0.107       0.122       0.124       0.130
+    D3               0.045       0.051       0.053       0.064       0.077       0.079       0.084
+    IH1              0.139       0.144       0.146       0.159       0.171       0.174       0.179
+    IH2              0.121       0.128       0.131       0.149       0.165       0.169       0.175
+    IH3              0.187       0.193       0.196       0.213       0.230       0.234       0.242
+    A1               0.169       0.177       0.181       0.208       0.233       0.239       0.251
+    A2               0.150       0.160       0.165       0.193       0.222       0.230       0.241
+    A3               0.386       0.393       0.400       0.431       0.462       0.469       0.481
+    IP              11.569      12.482      12.962      15.678      18.936      19.584      20.677
+    D                0.221       0.242       0.248       0.282       0.326       0.334       0.347
+    IH               0.323       0.332       0.338       0.360       0.396       0.400       0.407
+    A                0.603       0.624       0.635       0.683       0.740       0.752       0.773
+
+New/Additional Parameters
+    IND111          -0.052      -0.042      -0.035      -0.013       0.002       0.005       0.009
+    IND112          -0.653      -0.571      -0.504      -0.271      -0.130      -0.102      -0.062
+    IND211          -0.009      -0.003      -0.001       0.008       0.023       0.028       0.036
+    IND212           0.036       0.062       0.072       0.169       0.319       0.352       0.424
+    IND121          -0.045      -0.029      -0.026      -0.008       0.001       0.002       0.007
+    IND122          -0.470      -0.347      -0.279      -0.116      -0.023      -0.008       0.017
+    IND221          -0.005      -0.002       0.000       0.007       0.020       0.024       0.031
+    IND222           0.004       0.020       0.031       0.102       0.229       0.248       0.305
+    IND131          -0.171      -0.145      -0.132      -0.077      -0.040      -0.035      -0.024
+    IND132          -0.901      -0.735      -0.654      -0.312      -0.038      -0.009       0.049
+    IND231           0.002       0.006       0.009       0.026       0.051       0.057       0.065
+    IND232          -0.012       0.006       0.018       0.105       0.298       0.337       0.392
+    IND141          -0.193      -0.177      -0.140      -0.035       0.007       0.018       0.053
+    IND142          -1.982      -0.991      -0.904      -0.056       0.155       0.237       0.429
+    IND241          -0.030      -0.009      -0.002       0.039       0.163       0.209       0.295
+    IND242          -0.566      -0.299      -0.193       0.063       0.694       0.862       1.122
+    IND151          -0.083      -0.052      -0.037      -0.002       0.013       0.021       0.039
+    IND152          -1.068      -0.725      -0.561      -0.029       0.188       0.277       0.474
+    IND251          -0.027      -0.018      -0.012       0.001       0.033       0.039       0.060
+    IND252          -0.305      -0.206      -0.167       0.026       0.368       0.476       0.614
+
+
+PLOT INFORMATION
+
+The following plots are available:
+
+  Sample proportions
+  Bootstrap distributions
+
+     Beginning Time:  17:45:40
+        Ending Time:  21:34:51
+       Elapsed Time:  03:49:11
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2019 Muthen & Muthen

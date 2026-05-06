@@ -1,0 +1,24 @@
+TITLE:
+proximal minority stress CFA;
+DATA:
+FILE = "Proximal_cfa.dat"; 
+VARIABLE:
+NAMES = HomoN1 HomoN2 HomoN3 HomoN4 HomoN5 HomoN6 HomoN7 HomoN8 HomoN9 HomoN10
+     HomoN11 Conceal1 Conceal2 Conceal3 Affirm1 Affirm2 Affirm3 Affirm4 Affirm5
+     Affirm6 Affirm7; 
+ MISSING=.;
+ usevar = 
+    HomoN1-Affirm7;
+ANALYSIS:
+estimator = MLR;
+    processors = 20;
+MODEL:
+homoncon by HomoN1-Conceal3*;
+    homoncon by HomoN1@1;
+    affirm by Affirm1-Affirm7;
+    affirm by Affirm1@1;
+    homoncon with affirm
+OUTPUT:
+sampstat standardized;
+PLOT:
+type=plot2;
